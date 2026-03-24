@@ -1,0 +1,1573 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>OpenVita</title>
+<meta name="theme-color" content="#050810">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&display=swap" rel="stylesheet">
+<style>
+/* ════════════════════════════════════════════════
+   OBRA-INSPIRED CLINICAL MINIMAL — OpenVita
+   Niko / Nicolas Julienne Labs
+   ════════════════════════════════════════════════ */
+:root {
+  --h: 100vh;
+  /* Palette */
+  --ink:       #050810;
+  --ink-2:     #0d1221;
+  --ink-3:     #151d30;
+  --line:      rgba(255,255,255,0.07);
+  --line-2:    rgba(255,255,255,0.12);
+  --text:      #eef0f5;
+  --text-2:    #8b93a8;
+  --text-3:    #50576a;
+  --mint:      #00e5a0;
+  --mint-dim:  rgba(0,229,160,0.12);
+  --mint-glow: rgba(0,229,160,0.06);
+  --blue:      #4da6ff;
+  --blue-dim:  rgba(77,166,255,0.10);
+  --amber:     #f59e0b;
+  --red:       #f05252;
+  --red-dim:   rgba(240,82,82,0.10);
+  --purple:    #9b8aff;
+  /* Layout */
+  --r-sm:  8px;
+  --r-md:  14px;
+  --r-lg:  20px;
+  --r-xl:  26px;
+}
+
+@supports (height: 100dvh) { :root { --h: 100dvh; } }
+
+/* ── RESET ── */
+*, *::before, *::after { box-sizing: border-box; -webkit-tap-highlight-color: transparent; margin: 0; padding: 0; }
+
+/* ── ROOT LAYOUT — Ancré au viewport, zéro overflow ── */
+html {
+  /* FIX Android: position:fixed coupe tout débordement */
+  /* dvh fallback */
+  height: var(--h);
+  height: 100%;
+  overflow: hidden;
+}
+body {
+  position: fixed;
+  inset: 0;
+  background: var(--ink);
+  color: var(--text);
+  font-family: 'DM Sans', system-ui, sans-serif;
+  font-size: 15px;
+  line-height: 1.5;
+  overflow: hidden;
+  /* FIX: évite le décalage horizontal Android */
+  width: 100%;
+  height: 100%;
+}
+
+/* ── FOND — mesh gradient subtil ── */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 60% 50% at 15% 10%, rgba(0,229,160,0.07) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 60% at 85% 90%, rgba(77,166,255,0.05) 0%, transparent 60%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ── APP WRAPPER — centré, jamais plus large que l'écran ── */
+#app {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 480px;
+  height: 100%;
+  /* FIX: margin auto centre sans justify-content */
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: var(--ink-2);
+  border-left:  1px solid var(--line);
+  border-right: 1px solid var(--line);
+}
+@media (max-width: 480px) {
+  #app { border-left: none; border-right: none; }
+}
+
+/* ── MODALES ── */
+.modal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 900;
+  background: rgba(5,8,16,0.92);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+.modal.on { display: flex; }
+.mc {
+  width: 100%;
+  max-width: 400px;
+  background: var(--ink-3);
+  border: 1px solid var(--line-2);
+  border-radius: var(--r-xl);
+  padding: 28px 24px;
+}
+.mc h3 {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--mint);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+}
+.mc p {
+  font-size: 0.875rem;
+  color: var(--text-2);
+  line-height: 1.6;
+  margin-bottom: 10px;
+}
+.mc input {
+  width: 100%;
+  background: var(--ink);
+  border: 1px solid var(--line-2);
+  border-radius: var(--r-md);
+  padding: 12px 14px;
+  color: var(--text);
+  font-size: 16px;
+  font-family: 'DM Mono', monospace;
+  outline: none;
+  margin: 10px 0;
+  transition: border-color 0.2s;
+}
+.mc input:focus { border-color: var(--mint); }
+.mc input::placeholder { color: var(--text-3); }
+.btn-primary {
+  width: 100%;
+  background: var(--mint);
+  color: var(--ink);
+  border: none;
+  border-radius: var(--r-md);
+  padding: 13px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 10px;
+  transition: opacity 0.2s;
+}
+.btn-primary:active { opacity: 0.85; }
+.btn-secondary {
+  width: 100%;
+  background: transparent;
+  color: var(--text-2);
+  border: 1px solid var(--line-2);
+  border-radius: var(--r-md);
+  padding: 12px;
+  font-size: 0.875rem;
+  cursor: pointer;
+  margin-top: 8px;
+  transition: border-color 0.2s;
+}
+.btn-secondary:active { border-color: var(--text-2); }
+
+/* ── HEADER ── */
+.hdr {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  padding-top: max(12px, env(safe-area-inset-top));
+  border-bottom: 1px solid var(--line);
+  background: var(--ink-2);
+}
+.hdr-brand {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+.hdr-brand h1 {
+  font-family: 'DM Mono', monospace;
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--text);
+  letter-spacing: 0.04em;
+}
+.hdr-brand h1 span { color: var(--mint); }
+.hdr-tag {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.62rem;
+  color: var(--text-3);
+  letter-spacing: 0.06em;
+  padding: 2px 6px;
+  border: 1px solid var(--line-2);
+  border-radius: 4px;
+}
+.hdr-actions { display: flex; align-items: center; gap: 6px; }
+.hbtn {
+  display: flex; align-items: center; justify-content: center;
+  width: 34px; height: 34px; border-radius: 50%;
+  background: transparent; border: 1px solid var(--line-2);
+  color: var(--text-2); cursor: pointer; transition: all 0.2s;
+}
+.hbtn svg { width: 14px; height: 14px; fill: currentColor; }
+.hbtn:hover, .hbtn:active { background: var(--line-2); color: var(--text); }
+.hbtn.danger:active { border-color: var(--red); color: var(--red); background: var(--red-dim); }
+.sos-pill {
+  display: flex; align-items: center; gap: 5px;
+  padding: 7px 12px; border-radius: 20px;
+  background: var(--red-dim); border: 1px solid rgba(240,82,82,0.3);
+  color: #f99; font-size: 0.78rem; font-weight: 600;
+  font-family: 'DM Mono', monospace; letter-spacing: 0.05em;
+  cursor: pointer; transition: all 0.2s;
+}
+.sos-pill:active { background: rgba(240,82,82,0.2); }
+.sos-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--red); animation: blink 2s infinite;
+}
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.2} }
+body.sos .hdr { border-bottom-color: rgba(240,82,82,0.3); }
+body.sos .hdr-brand h1 span { color: var(--amber); }
+
+/* ── CHAT WINDOW ── */
+#cwin {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+/* FIX: custom scrollbar discret */
+#cwin::-webkit-scrollbar { width: 3px; }
+#cwin::-webkit-scrollbar-track { background: transparent; }
+#cwin::-webkit-scrollbar-thumb { background: var(--line-2); border-radius: 2px; }
+
+/* ── MESSAGES ── */
+.msg {
+  /* FIX Android: max-width + min-width:0 + overflow-wrap */
+  max-width: 92%;
+  min-width: 0;
+  width: fit-content;
+  padding: 11px 14px;
+  border-radius: var(--r-lg);
+  font-size: 0.9rem;
+  line-height: 1.6;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+}
+.ai {
+  align-self: flex-start;
+  background: var(--ink-3);
+  border: 1px solid var(--line-2);
+  border-bottom-left-radius: 4px;
+  color: var(--text);
+}
+body.sos .ai { border-color: rgba(240,82,82,0.25); background: rgba(240,82,82,0.05); }
+.usr {
+  align-self: flex-end;
+  background: var(--mint-dim);
+  border: 1px solid rgba(0,229,160,0.18);
+  border-bottom-right-radius: 4px;
+  color: var(--text);
+}
+/* Markdown */
+.msg strong { color: var(--text); font-weight: 600; }
+.msg em { color: var(--mint); font-style: italic; }
+.msg code {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.82em;
+  background: rgba(0,0,0,0.4);
+  border: 1px solid var(--line-2);
+  border-radius: 4px;
+  padding: 1px 5px;
+  color: var(--blue);
+}
+.msg h3 {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: var(--mint);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  margin: 10px 0 4px;
+  padding-bottom: 4px;
+  border-bottom: 1px solid var(--line);
+}
+.msg ul { margin: 6px 0 6px 16px; }
+.msg li { margin-bottom: 3px; }
+.msg hr { border: none; border-top: 1px solid var(--line); margin: 8px 0; }
+.prev-img { max-width: 100%; border-radius: var(--r-md); margin-top: 8px; display: block; border: 1px solid var(--line-2); }
+
+/* Dots typing */
+.dots { display: inline-flex; gap: 4px; align-items: center; }
+.dots span {
+  width: 5px; height: 5px; border-radius: 50%;
+  background: var(--mint); opacity: 0.4;
+  animation: dbounce 1.2s infinite;
+}
+.dots span:nth-child(2) { animation-delay: .2s; }
+.dots span:nth-child(3) { animation-delay: .4s; }
+@keyframes dbounce { 0%,60%,100%{transform:translateY(0);opacity:.3} 30%{transform:translateY(-5px);opacity:1} }
+
+/* ── INPUT BAR ── */
+.inpa {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 10px 14px;
+  padding-bottom: max(10px, env(safe-area-inset-bottom));
+  border-top: 1px solid var(--line);
+  background: var(--ink);
+}
+.ibtn-sm {
+  flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  width: 36px; height: 36px; border-radius: 50%;
+  background: transparent; border: 1px solid var(--line-2);
+  color: var(--text-3); cursor: pointer; transition: all 0.2s;
+}
+.ibtn-sm svg { width: 16px; height: 16px; fill: currentColor; }
+.ibtn-sm:active { background: var(--line-2); color: var(--text); }
+.ibtn-sm.cam { color: var(--mint); border-color: rgba(0,229,160,0.3); background: var(--mint-glow); }
+.ibtn-sm.rec { color: var(--red); border-color: rgba(240,82,82,0.4); animation: pulse 1s infinite alternate; }
+@keyframes pulse { 0%{opacity:1} 100%{opacity:0.4} }
+#uIn {
+  flex: 1;
+  min-width: 0;
+  background: var(--ink-3);
+  border: 1px solid var(--line-2);
+  border-radius: 20px;
+  padding: 10px 16px;
+  color: var(--text);
+  font-family: 'DM Sans', sans-serif;
+  font-size: max(16px, 0.875rem);
+  outline: none;
+  transition: border-color 0.2s;
+}
+#uIn:focus { border-color: var(--mint); }
+#uIn::placeholder { color: var(--text-3); }
+.send-btn {
+  flex-shrink: 0;
+  width: 38px; height: 38px; border-radius: 50%;
+  background: var(--mint); border: none;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; transition: opacity 0.2s;
+}
+.send-btn:active { opacity: 0.8; }
+.send-btn svg { width: 16px; height: 16px; fill: var(--ink); }
+
+/* ── LEGAL NOTE ── */
+.legal { font-size: 0.72rem; color: #f99; margin-top: 7px; display: block;
+  border-top: 1px solid rgba(249,153,153,.2); padding-top: 5px; }
+
+/* ── OPEN FOOD FACTS CARDS ── */
+.ofc {
+  background: var(--ink-3);
+  border: 1px solid rgba(0,229,160,0.2);
+  border-radius: var(--r-md);
+  padding: 12px 14px;
+  margin-top: 8px;
+  animation: fadeUp 0.35s ease;
+}
+@keyframes fadeUp { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }
+.ofh { display: flex; align-items: center; gap: 6px; margin-bottom: 8px; }
+.ofn { flex: 1; min-width: 0; font-weight: 600; font-size: 0.85rem; color: var(--mint);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ofs { font-family: 'DM Mono', monospace; font-size: 0.62rem; color: var(--text-3);
+  padding: 2px 5px; border: 1px solid var(--line-2); border-radius: 4px; white-space: nowrap; }
+.nsb { width: 24px; height: 24px; border-radius: 5px; display: inline-flex;
+  align-items: center; justify-content: center;
+  font-weight: 900; font-size: 0.8rem; color: white; flex-shrink: 0; }
+.na{background:#1e8f4e}.nb{background:#7ac547}.nc{background:#ffc734;color:#333}
+.nd{background:#ef7d00}.ne{background:#e63312}.nu{background:#2d3555;color:#8b93a8}
+.ofm { display: grid; grid-template-columns: repeat(2, 1fr); gap: 5px; }
+.om { background: var(--ink); border-radius: var(--r-sm); padding: 7px 9px; border: 1px solid var(--line); }
+.oml { color: var(--text-3); font-size: 0.7rem; margin-bottom: 2px; }
+.omv { font-family: 'DM Mono', monospace; font-weight: 500; font-size: 0.88rem; color: var(--text); }
+.omb { height: 2px; border-radius: 1px; margin-top: 4px; background: var(--line-2); overflow: hidden; }
+.omf { height: 100%; border-radius: 1px; transition: width 0.5s ease; }
+.bc{background:var(--amber)}.bk{background:var(--red)}.bp{background:var(--blue)}
+.bf{background:var(--mint)}.bl{background:var(--purple)}.bs{background:#fb923c}
+.ofl { font-size: 0.66rem; color: var(--text-3); margin-top: 7px; padding-top: 6px;
+  border-top: 1px solid var(--line); }
+/* Portion block */
+.off-portion {
+  background: var(--blue-dim); border: 1px solid rgba(77,166,255,0.15);
+  border-radius: var(--r-sm); padding: 8px 10px; margin-top: 8px; font-size: 0.78rem;
+}
+.off-portion strong { color: var(--blue); }
+.gi-lo{color:var(--mint)}.gi-mid{color:var(--amber)}.gi-hi{color:var(--red)}
+
+/* OFF Search */
+.off-sw { display: flex; gap: 6px; margin-top: 8px; }
+.off-si {
+  flex: 1; min-width: 0;
+  background: var(--ink); border: 1px solid var(--line-2);
+  border-radius: var(--r-md); padding: 8px 12px;
+  color: var(--text); font-size: max(16px, 0.85rem); outline: none;
+}
+.off-si:focus { border-color: var(--mint); }
+.off-sb {
+  background: var(--mint-dim); border: 1px solid rgba(0,229,160,0.25);
+  border-radius: var(--r-md); padding: 8px 12px;
+  color: var(--mint); font-size: 0.85rem; cursor: pointer; white-space: nowrap;
+}
+.off-sg { color: var(--text-3); font-size: 0.8rem; text-align: center; padding: 8px; }
+
+/* ── CARB RESULT CARD ── */
+.carb-result {
+  background: var(--ink-3); border: 1px solid rgba(0,229,160,0.2);
+  border-radius: var(--r-lg); padding: 14px; margin-top: 8px;
+  animation: fadeUp 0.35s ease;
+}
+.carb-total { font-family: 'DM Mono', monospace; font-size: 2.4rem; font-weight: 500; color: var(--mint); letter-spacing: -2px; line-height: 1; }
+.carb-unit { font-size: 0.82rem; color: var(--text-3); margin-left: 4px; }
+.carb-row {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 7px 0; border-bottom: 1px solid var(--line);
+}
+.carb-row:last-child { border-bottom: none; }
+.carb-food { font-size: 0.85rem; color: var(--text); }
+.carb-val { font-family: 'DM Mono', monospace; font-size: 0.85rem; font-weight: 500; color: var(--mint); }
+.carb-gi {
+  font-size: 0.66rem; padding: 1px 5px;
+  border-radius: 4px; margin-left: 5px;
+  border: 1px solid currentColor; font-family: 'DM Mono', monospace;
+}
+.plate-tip {
+  font-size: 0.75rem; color: var(--text-2); margin-top: 8px;
+  padding: 7px 9px; border-radius: var(--r-sm);
+  background: rgba(255,255,255,0.03); border-left: 2px solid var(--mint);
+}
+
+/* ── CAMERA MODAL ── */
+.plate-modal { display: none; position: fixed; inset: 0; z-index: 800; background: #000; flex-direction: column; }
+.plate-modal.on { display: flex; }
+.plate-hdr {
+  flex-shrink: 0; display: flex; align-items: center; justify-content: space-between;
+  padding: 12px 16px; padding-top: max(12px, env(safe-area-inset-top));
+  background: rgba(5,8,16,0.9); border-bottom: 1px solid var(--line);
+}
+.plate-hdr-title { font-family: 'DM Mono', monospace; font-size: 0.8rem; color: var(--mint); letter-spacing: 0.06em; text-transform: uppercase; }
+.plate-close {
+  width: 32px; height: 32px; border-radius: 50%;
+  background: rgba(255,255,255,0.08); border: 1px solid var(--line-2);
+  color: var(--text-2); cursor: pointer; font-size: 1rem;
+  display: flex; align-items: center; justify-content: center;
+}
+.plate-vp { flex: 1; min-height: 0; position: relative; overflow: hidden; background: #000; display: flex; align-items: center; justify-content: center; }
+#plateVideo { width: 100%; height: 100%; object-fit: cover; display: none; }
+#plateCanvas { display: none; }
+#platePreview { max-width: 100%; max-height: 100%; object-fit: contain; display: none; }
+#plateCamStatus { position: absolute; color: var(--text-2); font-size: 0.85rem; text-align: center; padding: 20px; }
+.plate-guide {
+  position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%);
+  width: 82%; aspect-ratio: 4/3;
+  border: 1.5px dashed rgba(0,229,160,0.4); border-radius: var(--r-lg);
+  pointer-events: none; display: none;
+}
+.plate-guide::after {
+  content: 'Cadrez votre assiette';
+  position: absolute; bottom: -26px; left: 50%; transform: translateX(-50%);
+  font-size: 0.72rem; color: rgba(0,229,160,0.6); white-space: nowrap;
+  font-family: 'DM Mono', monospace;
+}
+.plate-ctrl {
+  flex-shrink: 0; padding: 16px;
+  padding-bottom: max(16px, env(safe-area-inset-bottom));
+  background: rgba(5,8,16,0.9); border-top: 1px solid var(--line);
+}
+.snap-btn {
+  width: 60px; height: 60px; border-radius: 50%;
+  background: var(--mint); border: none;
+  display: flex; align-items: center; justify-content: center;
+  margin: 0 auto; cursor: pointer;
+  box-shadow: 0 0 0 5px rgba(0,229,160,0.15), 0 0 0 10px rgba(0,229,160,0.06);
+}
+.snap-btn svg { width: 24px; height: 24px; fill: var(--ink); }
+.plate-hint { text-align: center; margin-top: 10px; font-size: 0.73rem; color: var(--text-3); font-family: 'DM Mono', monospace; }
+.plate-actions { display: flex; gap: 10px; justify-content: center; }
+.plate-retake {
+  padding: 10px 18px; border-radius: var(--r-md);
+  background: rgba(255,255,255,0.06); border: 1px solid var(--line-2);
+  color: var(--text-2); font-size: 0.85rem; cursor: pointer;
+}
+.plate-analyze {
+  padding: 10px 22px; border-radius: var(--r-md);
+  background: var(--mint); border: none;
+  color: var(--ink); font-size: 0.875rem; font-weight: 600; cursor: pointer;
+}
+.analyzing-state { text-align: center; padding: 8px 0; }
+.analyzing-state .dots span { background: var(--mint); }
+</style>
+</head>
+<body>
+
+<!-- MODAL RGPD -->
+<div class="modal on" id="mRgpd">
+  <div class="mc">
+    <h3>Avertissement Légal</h3>
+    <p><strong style="color:var(--text)">Dispositif logiciel expérimental.</strong> OpenVita ne remplace pas un médecin, un diagnostic médical ou les recommandations de l'ANSM.</p>
+    <p>Données traitées localement (RGPD). En cas d'urgence : composez le <strong style="color:var(--red)">15</strong>.</p>
+    <button class="btn-primary" onclick="acceptRGPD()">Accepter et continuer</button>
+  </div>
+</div>
+
+<!-- MODAL API -->
+<div class="modal" id="mApi">
+  <div class="mc">
+    <h3>Clé API Mistral</h3>
+    <p>Stockée localement sur cet appareil. Jamais transmise à nos serveurs.</p>
+    <input type="password" id="apiIn" placeholder="sk-xxxxxxxxxxxxxxxx" autocomplete="off">
+    <button class="btn-primary" onclick="saveKey()">Enregistrer</button>
+    <button class="btn-secondary" onclick="closeM('mApi')">Annuler</button>
+  </div>
+</div>
+
+<!-- MODAL CAMÉRA -->
+<div class="plate-modal" id="plateModal">
+  <div class="plate-hdr">
+    <span class="plate-hdr-title">Analyse glucides</span>
+    <button class="plate-close" onclick="closePlateModal()">✕</button>
+  </div>
+  <div class="plate-vp">
+    <video id="plateVideo" autoplay playsinline muted></video>
+    <canvas id="plateCanvas"></canvas>
+    <img id="platePreview" alt="Assiette">
+    <div id="plateCamStatus">Activation caméra…</div>
+    <div class="plate-guide" id="plateGuide"></div>
+  </div>
+  <div class="plate-ctrl" id="plateControls">
+    <div id="snapPhase">
+      <button class="snap-btn" onclick="snapPhoto()">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.2"/><path d="M9 2L7.17 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2h-3.17L15 2H9zm3 15c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5z"/></svg>
+      </button>
+      <div class="plate-hint">Photographiez votre assiette</div>
+    </div>
+    <div id="previewPhase" style="display:none">
+      <div class="plate-actions">
+        <button class="plate-retake" onclick="retakePhoto()">↺ Reprendre</button>
+        <button class="plate-analyze" onclick="analyzePlate()">Analyser</button>
+      </div>
+    </div>
+    <div id="analyzingPhase" style="display:none" class="analyzing-state">
+      <span class="dots"><span></span><span></span><span></span></span>
+      <div style="font-size:.78rem;color:var(--text-3);margin-top:8px;font-family:'DM Mono',monospace">Pixtral analyse votre assiette…</div>
+    </div>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app">
+
+  <!-- HEADER -->
+  <div class="hdr">
+    <div class="hdr-brand">
+      <h1>Open<span>Vita</span></h1>
+      <span class="hdr-tag">v2</span>
+    </div>
+    <div class="hdr-actions">
+      <button class="hbtn danger" onclick="purge()" title="Effacer les données">
+        <svg viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
+      </button>
+      <button class="hbtn" onclick="openM('mApi')" title="Configuration API">
+        <svg viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"/></svg>
+      </button>
+      <button class="sos-pill" onclick="trigSOS()">
+        <span class="sos-dot"></span>SOS
+      </button>
+    </div>
+  </div>
+
+  <!-- CHAT -->
+  <div id="cwin"></div>
+
+  <!-- INPUT BAR -->
+  <div class="inpa">
+    <input type="file" id="fInput" accept="image/*" onchange="handleFile(event)" style="display:none">
+    <input type="file" id="fCam" accept="image/*" capture="environment" onchange="handleFile(event)" style="display:none">
+    <!-- Caméra analyse assiette -->
+    <button class="ibtn-sm cam" onclick="openPlateModal()" title="Analyser une assiette">
+      <svg viewBox="0 0 24 24"><path d="M9 2L7.17 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2h-3.17L15 2H9zm3 15c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5z"/></svg>
+    </button>
+    <!-- Galerie -->
+    <button class="ibtn-sm" onclick="document.getElementById('fInput').click()" title="Galerie">
+      <svg viewBox="0 0 24 24"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3L14.5 12l4.5 6H5l3.5-4.5z"/></svg>
+    </button>
+    <!-- Recherche aliment -->
+    <button class="ibtn-sm" onclick="showOFFSearch()" title="Aliment">
+      <svg viewBox="0 0 24 24"><path d="M11 9H9V2H7v7H5V2H3v7c0 2.12 1.66 3.84 3.75 3.97V22h2.5v-9.03C11.34 12.84 13 11.12 13 9V2h-2v7zm5-3v8h2.5v8H21V2c-2.76 0-5 2.24-5 4z"/></svg>
+    </button>
+    <!-- Micro -->
+    <button class="ibtn-sm" id="micBtn" onclick="toggleVoice()" title="Voix">
+      <svg viewBox="0 0 24 24"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.3-3c0 3-2.54 5.1-5.3 5.1S6.7 14 6.7 11H5c0 3.41 2.72 6.23 6 6.72V21h2v-3.28c3.28-.48 6-3.3 6-6.72h-1.7z"/></svg>
+    </button>
+    <input type="text" id="uIn" placeholder="Message…"
+           autocomplete="off" autocorrect="off" spellcheck="false"
+           onkeydown="if(event.key==='Enter')send()">
+    <button class="send-btn" onclick="send()">
+      <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+    </button>
+  </div>
+</div>
+
+<script>
+
+const AURL='https://api.mistral.ai/v1/chat/completions';
+function sl(a,k,v){try{if(a==='g')return localStorage.getItem(k);if(a==='s')localStorage.setItem(k,v);if(a==='c')localStorage.clear();}catch(e){return null;}}
+function sk(k){return(k||'').replace(/[^\x20-\x7E]/g,'').trim();}
+function openM(id){const el=document.getElementById(id);el.style.display='flex';el.classList.add('on');}
+function closeM(id){const el=document.getElementById(id);el.style.display='none';el.classList.remove('on');}
+
+let key=sk(sl('g','ov_k')||''),rgpd=sl('g','ov_r')==='1';
+const SYS=`Tu es OpenVita, dispositif medical d'accompagnement (Endocrinologie/Algologie).
+REGLES: 1.Valide la douleur. 2.Douleur thoracique/paralysie->ordonne le 15. 3.Concis et clinique. 4.NUTRITION:identifie aliments,ne fabrique pas de chiffres.`;
+let hist=[];
+try{const s=sl('g','ov_h');hist=s?JSON.parse(s):[{role:'system',content:SYS}];}catch(e){hist=[{role:'system',content:SYS}];}
+
+window.addEventListener('load',()=>{
+  if(rgpd){closeM('mRgpd');if(!key)openM('mApi');}
+  renderHist();
+  if(hist.length===1&&rgpd)addMsg("Systeme initialise. Je suis OpenVita. Comment puis-je vous assister ?","ai");
+});
+
+function acceptRGPD(){sl('s','ov_r','1');rgpd=true;closeM('mRgpd');if(!key)openM('mApi');if(hist.length===1)addMsg("Systeme initialise. Je suis OpenVita. Comment puis-je vous assister ?","ai");}
+function purge(){if(confirm("Supprimer DEFINITIVEMENT tout votre historique medical ?")){sl('c');location.reload();}}
+function saveKey(){key=sk(document.getElementById('apiIn').value);sl('s','ov_k',key);closeM('mApi');}
+
+// VOIX — cross-platform
+const SR=window.SpeechRecognition||window.webkitSpeechRecognition||null;
+let isRec=false;
+function diagMic(){
+  // Diagnostic plateforme
+  const proto=location.protocol;
+  const isIOS=/iPad|iPhone|iPod/.test(navigator.userAgent)&&!window.MSStream;
+  const isAndroid=/Android/.test(navigator.userAgent);
+  let msg='';
+  if(proto==='file:'){
+    msg='\u26a0\ufe0f Fichier local detecte (file://).\n\n';
+    if(isIOS)msg+='Sur iOS Safari : ouvrez le fichier via un serveur web (ex: via Files > partage) ou installez-le en PWA depuis Safari.\n';
+    else msg+='Le micro necessite HTTPS ou localhost. Ouvrez le fichier via un serveur local.\n';
+    msg+='\nAlternativement : saisissez votre message par texte.';
+    return msg;
+  }
+  if(proto!=='https:'&&location.hostname!=='localhost'&&location.hostname!=='127.0.0.1'){
+    return '\u26a0\ufe0f Le micro necessite HTTPS.\n\nHospitalisez la page sur un serveur HTTPS ou utilisez localhost.';
+  }
+  if(isIOS){
+    return '\u26a0\ufe0f iOS Safari : acces micro refuse.\n\nVerifiez :\n1. Reglages > Safari > Microphone = Autoriser\n2. Reglages > Confidentialite > Microphone > Safari = Actif\n3. Rechargez la page et reessayez.';
+  }
+  if(isAndroid){
+    return '\u26a0\ufe0f Android Chrome : acces micro refuse.\n\nVerifiez :\n1. Dans Chrome : icone cadenas (barre adresse) > Microphone = Autoriser\n2. Parametres Android > Applications > Chrome > Autorisations > Micro = Actif\n3. Rechargez et reessayez.';
+  }
+  return '\u26a0\ufe0f Micro refuse.\n\nCliquez sur l\'icone cadenas dans la barre d\'adresse > Microphone > Autoriser, puis rechargez la page.';
+}
+
+function toggleVoice(){
+  const btn=document.getElementById('micBtn');
+  // Arreter si en cours
+  if(isRec){isRec=false;btn.classList.remove('rec');return;}
+  // Verifier disponibilite
+  if(!SR){
+    const isIOS=/iPad|iPhone|iPod/.test(navigator.userAgent)&&!window.MSStream;
+    alert(isIOS?'Reconnaissance vocale non disponible.\nVerifiez que vous utilisez Safari (pas Chrome/Firefox) sur iOS.'
+      :'Reconnaissance vocale non supportee sur ce navigateur.\nUtilisez Chrome ou Safari.');
+    return;
+  }
+  // Verifier HTTPS si pas localhost
+  if(location.protocol!=='https:'&&location.hostname!=='localhost'&&location.hostname!=='127.0.0.1'){
+    alert('\u26a0\ufe0f Le microphone necessite HTTPS.\n\nOuvrez ce fichier depuis un serveur HTTPS pour utiliser la voix.\nLa saisie texte reste disponible.');
+    return;
+  }
+  // Demander permission explicitement d'abord sur iOS (evite le refus silencieux)
+  const isIOS=/iPad|iPhone|iPod/.test(navigator.userAgent)&&!window.MSStream;
+  if(isIOS&&navigator.mediaDevices&&navigator.mediaDevices.getUserMedia){
+    navigator.mediaDevices.getUserMedia({audio:true})
+      .then(stream=>{stream.getTracks().forEach(t=>t.stop());startRecognition(btn);})
+      .catch(err=>{
+        let msg='\u26a0\ufe0f Acces microphone refuse sur iOS Safari.\n\n';
+        msg+='Pour autoriser :\n1. Reglages iPhone > Safari > Microphone = Demander\n';
+        msg+='2. Revenez sur cette page et reessayez.\n';
+        msg+='3. Si le probleme persiste : Reglages > Confidentialite > Microphone > Safari.';
+        alert(msg);
+      });
+    return;
+  }
+  startRecognition(btn);
+}
+
+function startRecognition(btn){
+  const r=new SR();
+  r.lang='fr-FR';r.interimResults=false;r.maxAlternatives=1;
+  r.onstart=()=>{isRec=true;btn.classList.add('rec');};
+  r.onresult=e=>{
+    document.getElementById('uIn').value=e.results[0][0].transcript;
+    isRec=false;btn.classList.remove('rec');
+    send(true);
+  };
+  r.onerror=e=>{
+    isRec=false;btn.classList.remove('rec');
+    if(e.error==='not-allowed'||e.error==='permission-denied'){
+      alert(diagMic());
+    } else if(e.error==='no-speech'){
+      // Silence detecte — pas d'alerte, juste stopper
+    } else if(e.error==='network'){
+      alert('\u26a0\ufe0f Erreur reseau : la reconnaissance vocale necessite une connexion internet active.');
+    } else {
+      console.warn('SpeechRecognition error:',e.error);
+    }
+  };
+  r.onend=()=>{isRec=false;btn.classList.remove('rec');};
+  try{r.start();}catch(e){
+    isRec=false;btn.classList.remove('rec');
+    alert('Impossible de demarrer le microphone. '+e.message);
+  }
+}
+function speakAI(t){
+  if(!window.speechSynthesis) return;
+  // Nettoyer le texte avant lecture
+  const clean = t
+    .replace(/#{1,3} /g,'')          // titres markdown
+    .replace(/\*{1,3}([^*]+)\*{1,3}/g,'$1') // gras/italique
+    .replace(/`[^`]+`/g,'')          // code inline
+    .replace(/[\u26a0\u2705\u274c\u1f3e5\u1f4a1\u1f50d\u1f957]/gu,'') // emojis médicaux
+    .replace(/<[^>]+>/g,'')          // balises HTML résiduelles
+    .replace(/---+/g,'')             // séparateurs
+    .replace(/https?:\/\/\S+/g,'') // URLs
+    .replace(/\s{2,}/g,' ')
+    .trim()
+    .substring(0, 600);
+
+  if(!clean) return;
+  window.speechSynthesis.cancel();
+
+  // FIX iOS Safari: les voix se chargent en lazy — attendre si vide
+  function doSpeak(){
+    const u = new SpeechSynthesisUtterance(clean);
+    u.lang = 'fr-FR'; u.pitch = 0.95; u.rate = 0.9;
+    // Chercher une voix française (priorité locale, puis réseau)
+    const voices = window.speechSynthesis.getVoices();
+    const frLocal = voices.find(v => v.lang.startsWith('fr') && v.localService);
+    const frAny   = voices.find(v => v.lang.startsWith('fr'));
+    if(frLocal) u.voice = frLocal;
+    else if(frAny) u.voice = frAny;
+    // FIX Android Chrome: timeout anti-blocage TTS > 15s
+    u.onstart = () => { ttsWatchdog = setTimeout(()=>window.speechSynthesis.cancel(), 18000); };
+    u.onend   = () => { clearTimeout(ttsWatchdog); };
+    u.onerror = () => { clearTimeout(ttsWatchdog); };
+    window.speechSynthesis.speak(u);
+    // FIX Chrome: reprendre si suspendu (bug Chrome background tab)
+    setTimeout(()=>{ if(window.speechSynthesis.paused) window.speechSynthesis.resume(); },200);
+  }
+
+  const voices = window.speechSynthesis.getVoices();
+  if(voices.length > 0){
+    setTimeout(doSpeak, 80); // petit délai pour iOS
+  } else {
+    // Voix pas encore chargées — attendre l'event
+    window.speechSynthesis.onvoiceschanged = () => { setTimeout(doSpeak, 80); };
+  }
+}
+let ttsWatchdog = null;
+if(window.speechSynthesis)window.speechSynthesis.onvoiceschanged=()=>window.speechSynthesis.getVoices();
+
+// IMAGE
+let img64=null;
+function handleFile(e){
+  const f=e.target.files[0];if(!f)return;
+  const r=new FileReader();
+  r.onload=ev=>{img64=ev.target.result;addMsgH('<img src="'+img64+'" class="prev-img" alt="Image">','usr');document.getElementById('uIn').placeholder="Analyser ce document/aliment...";};
+  r.readAsDataURL(f);e.target.value='';
+}
+
+// HISTORIQUE — FIX: l'original avait skipRender qui bloquait l'affichage
+function renderHist(){
+  const c=document.getElementById('cwin');c.innerHTML='';
+  hist.forEach(m=>{
+    if(m.role==='system')return;
+    const t=typeof m.content==='string'?m.content:(m.content.find?.(x=>x.type==='text')?.text||'[Image]');
+    addMsg(t,m.role==='user'?'usr':'ai');
+  });
+}
+
+// SOS — FIX: SOS mode retire apres reponse, pas avant
+function trigSOS(){document.body.classList.add('sos');addMsg("SOS ACTIVE","usr");callAI("LE PATIENT A DECLENCHE LE BOUTON SOS. Urgence absolue — rappelle le 15 en PREMIER.",true,true);}
+
+// ENVOI
+function send(voice=false){
+  const inp=document.getElementById('uIn');const t=inp.value.trim();
+  if(!t&&!img64)return;
+  addMsg(t,'usr');inp.value='';
+  let cnt=t;
+  if(img64){cnt=[{type:'text',text:t||"Analyse ce visuel."},{type:'image_url',image_url:img64}];img64=null;document.getElementById('uIn').placeholder="Clinique, Nutrition, Urgence...";}
+  hist.push({role:'user',content:cnt});
+  callAI(null,voice,false);
+}
+
+// APPEL API
+async function callAI(override=null,voice=false,isSOS=false){
+  if(!key){openM('mApi');return;}
+  const c=document.getElementById('cwin');
+  const lid='l'+Date.now();
+  const ld=document.createElement('div');ld.className='msg ai';ld.id=lid;
+  ld.innerHTML='Analyse clinique... <span class="dots"><span></span><span></span><span></span></span>';
+  c.appendChild(ld);requestAnimationFrame(()=>{c.scrollTop=c.scrollHeight;});
+  const msgs=override?[...hist,{role:'user',content:override}]:hist;
+  try{
+    const r=await fetch(AURL,{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+key},
+      body:JSON.stringify({model:'pixtral-12b-2409',messages:msgs,temperature:0.2,max_tokens:1024})});
+    if(!r.ok){const err=await r.json().catch(()=>({}));throw new Error(err.message||'Erreur '+r.status);}
+    const d=await r.json();const rep=d.choices[0].message.content;
+    document.getElementById(lid)?.remove();
+    addMsg(rep,'ai');
+    hist.push({role:'assistant',content:rep});
+    sl('s','ov_h',JSON.stringify(hist));
+    if(!isSOS)document.body.classList.remove('sos');
+    const nkw=['aliment','manger','repas','glucide','calorie','nourriture','portion','nutrition','sucre','image','visuel','photo'];
+    if(nkw.some(k=>rep.toLowerCase().includes(k))&&!isSOS)enrichOFF(rep,c);
+    if(voice)speakAI(rep);
+  }catch(e){const el=document.getElementById(lid);if(el){el.innerHTML='Erreur: '+e.message;el.style.borderColor='rgba(239,68,68,.4)';}}
+}
+
+// RENDU MESSAGES — FIX: markdown rendu
+function md(t){
+  if(!t) return '';
+  // Echapper HTML basique avant de rendre le markdown
+  let s = t
+    .replace(/&/g,'&amp;')
+    .replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;');
+  // Titres ### ## #
+  s = s.replace(/^### (.+)$/gm,'<h3>$1</h3>');
+  s = s.replace(/^## (.+)$/gm,'<strong style="font-size:1rem;color:var(--blue);display:block;margin:8px 0 3px">$1</strong>');
+  s = s.replace(/^# (.+)$/gm,'<strong style="font-size:1.05rem;color:var(--blue);display:block;margin:8px 0 3px">$1</strong>');
+  // Gras et italique
+  s = s.replace(/\*\*\*(.+?)\*\*\*/g,'<strong><em>$1</em></strong>');
+  s = s.replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>');
+  s = s.replace(/\*([^\n]+?)\*/g,'<em>$1</em>');
+  s = s.replace(/_([^\n_]+?)_/g,'<em>$1</em>');
+  // Code inline
+  s = s.replace(/`([^`]+)`/g,'<code>$1</code>');
+  // Séparateur
+  s = s.replace(/^---+$/gm,'<hr>');
+  // Listes à tirets
+  s = s.replace(/^([\-\*]) (.+)$/gm,'<li>$2</li>');
+  s = s.replace(/(<li>.*<\/li>)/s, m => '<ul>'+m+'</ul>');
+  // Listes numérotées
+  s = s.replace(/^\d+\.\s+(.+)$/gm,'<li>$1</li>');
+  // Retours à la ligne
+  s = s.replace(/\n{2,}/g,'<br><br>');
+  s = s.replace(/\n/g,'<br>');
+  // Nettoyer les <br> autour des blocs
+  s = s.replace(/<br>(<\/?(h3|ul|ol|li|hr))/g,'$1');
+  s = s.replace(/(<\/?(h3|ul|ol|li|hr)>)<br>/g,'$1');
+  return s;
+}
+function addMsg(t,cls){
+  if(t===null||t===undefined||t==='') return;
+  const chat=document.getElementById('cwin');
+  const d=document.createElement('div');
+  d.className='msg '+cls;
+  try{ d.innerHTML=md(String(t)); }
+  catch(e){ d.textContent=String(t); } // fallback si md() échoue
+  chat.appendChild(d);
+  // Double rAF pour garantir le scroll après rendu DOM complet
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{
+    chat.scrollTop=chat.scrollHeight;
+    d.scrollIntoView({block:'end',behavior:'smooth'});
+  }));
+}
+function addMsgH(h,cls){
+  const chat=document.getElementById('cwin');
+  const d=document.createElement('div');
+  d.className='msg '+cls;
+  d.innerHTML=h||'';
+  chat.appendChild(d);
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{
+    chat.scrollTop=chat.scrollHeight;
+  }));
+}
+
+// OPEN FOOD FACTS
+const OFFURL='https://world.openfoodfacts.org/cgi/search.pl';
+const ofc={};
+// ═══════════════════════════════════════════════════════
+// BASE NUTRITIONNELLE CIQUAL/ANSES — Fruits, Légumes, Boissons
+// Champs : c=glucides(g/100g), k=kcal, p=protéines, f=lipides, fb=fibres, gi=index glycémique
+// ═══════════════════════════════════════════════════════
+const CIQUAL = {
+  // ── FRUITS ──────────────────────────────────────────
+  "pomme":           {c:11.4, k:52,  p:0.3, f:0.2, fb:2.4, gi:36},
+  "poire":           {c:12.4, k:52,  p:0.4, f:0.1, fb:3.1, gi:38},
+  "banane":          {c:20.5, k:89,  p:1.1, f:0.3, fb:2.6, gi:55},
+  "banane mure":     {c:23.0, k:95,  p:1.1, f:0.3, fb:2.0, gi:62},
+  "raisin":          {c:17.2, k:69,  p:0.7, f:0.2, fb:0.9, gi:49},
+  "orange":          {c:10.6, k:45,  p:0.9, f:0.1, fb:2.4, gi:43},
+  "mandarine":       {c:11.5, k:48,  p:0.7, f:0.2, fb:1.9, gi:42},
+  "pamplemousse":    {c:8.5,  k:38,  p:0.7, f:0.1, fb:1.8, gi:25},
+  "citron":          {c:6.5,  k:29,  p:1.1, f:0.3, fb:2.8, gi:20},
+  "fraise":          {c:6.2,  k:32,  p:0.7, f:0.3, fb:2.0, gi:40},
+  "framboise":       {c:5.4,  k:34,  p:1.2, f:0.7, fb:6.7, gi:25},
+  "mure":            {c:5.1,  k:35,  p:1.4, f:0.5, fb:5.3, gi:25},
+  "myrtille":        {c:11.5, k:51,  p:0.7, f:0.4, fb:2.4, gi:40},
+  "cerise":          {c:14.3, k:58,  p:1.0, f:0.2, fb:1.6, gi:22},
+  "abricot":         {c:9.5,  k:43,  p:1.4, f:0.1, fb:2.0, gi:34},
+  "peche":           {c:9.1,  k:42,  p:1.0, f:0.3, fb:1.5, gi:42},
+  "prune":           {c:10.5, k:49,  p:0.7, f:0.3, fb:1.4, gi:39},
+  "nectarine":       {c:10.0, k:44,  p:1.1, f:0.3, fb:1.7, gi:43},
+  "kiwi":            {c:11.7, k:55,  p:1.1, f:0.5, fb:3.0, gi:52},
+  "ananas":          {c:11.7, k:50,  p:0.5, f:0.1, fb:1.4, gi:59},
+  "mangue":          {c:14.0, k:61,  p:0.8, f:0.4, fb:1.8, gi:51},
+  "papaye":          {c:9.8,  k:43,  p:0.5, f:0.3, fb:1.8, gi:56},
+  "melon":           {c:7.4,  k:34,  p:0.8, f:0.2, fb:0.9, gi:60},
+  "pasteque":        {c:7.1,  k:30,  p:0.6, f:0.2, fb:0.4, gi:72},
+  "figue":           {c:16.3, k:74,  p:0.8, f:0.3, fb:2.9, gi:61},
+  "grenade":         {c:17.2, k:80,  p:1.0, f:0.4, fb:4.0, gi:35},
+  "litchi":          {c:16.5, k:66,  p:0.8, f:0.4, fb:1.3, gi:50},
+  "avocat":          {c:1.8,  k:160, p:2.0, f:15.0,fb:6.7, gi:10},
+  "datte":           {c:66.5, k:277, p:2.5, f:0.4, fb:8.0, gi:61},
+  "pruneaux":        {c:57.5, k:240, p:2.6, f:0.5, fb:7.1, gi:29},
+  "raisin sec":      {c:79.0, k:299, p:2.5, f:0.5, fb:3.7, gi:64},
+  "abricot sec":     {c:62.6, k:241, p:3.4, f:0.5, fb:7.3, gi:30},
+  "banane plantain": {c:31.9, k:122, p:1.3, f:0.4, fb:2.3, gi:55},
+  "fruit de la passion":{c:13.7,k:68,p:2.4,f:0.7, fb:10.4,gi:30},
+  "noix de coco":    {c:6.2,  k:354, p:3.3, f:33.5,fb:9.0, gi:45},
+
+  // ── LÉGUMES ─────────────────────────────────────────
+  "carotte":         {c:6.7,  k:41,  p:0.9, f:0.2, fb:2.8, gi:35},
+  "carotte cuite":   {c:7.9,  k:35,  p:0.7, f:0.2, fb:2.5, gi:47},
+  "tomate":          {c:3.2,  k:18,  p:0.9, f:0.2, fb:1.2, gi:30},
+  "tomate cerise":   {c:3.5,  k:18,  p:0.9, f:0.2, fb:1.2, gi:30},
+  "pomme de terre":  {c:15.4, k:70,  p:2.0, f:0.1, fb:1.8, gi:62},
+  "pomme de terre cuite":{c:17.5,k:78,p:2.1,f:0.1,fb:1.6, gi:65},
+  "frites":          {c:30.0, k:274, p:3.5, f:13.5,fb:2.5, gi:75},
+  "patate douce":    {c:20.1, k:90,  p:1.6, f:0.1, fb:3.0, gi:44},
+  "courge":          {c:6.5,  k:34,  p:1.2, f:0.1, fb:1.5, gi:65},
+  "courgette":       {c:2.5,  k:17,  p:1.2, f:0.3, fb:1.1, gi:15},
+  "aubergine":       {c:3.5,  k:24,  p:1.0, f:0.2, fb:3.4, gi:15},
+  "poivron":         {c:4.6,  k:27,  p:1.0, f:0.3, fb:1.9, gi:15},
+  "poivron rouge":   {c:6.0,  k:31,  p:1.0, f:0.3, fb:2.1, gi:15},
+  "concombre":       {c:2.2,  k:15,  p:0.7, f:0.1, fb:0.7, gi:15},
+  "celeri":          {c:2.4,  k:16,  p:0.7, f:0.2, fb:1.8, gi:35},
+  "brocoli":         {c:4.0,  k:34,  p:2.8, f:0.4, fb:2.6, gi:15},
+  "chou fleur":      {c:3.0,  k:25,  p:2.0, f:0.3, fb:2.5, gi:15},
+  "chou":            {c:4.3,  k:25,  p:1.3, f:0.2, fb:2.5, gi:10},
+  "chou rouge":      {c:5.5,  k:30,  p:1.4, f:0.2, fb:2.1, gi:10},
+  "chou de bruxelles":{c:5.2, k:43,  p:3.4, f:0.5, fb:3.8, gi:15},
+  "epinard":         {c:1.4,  k:23,  p:2.9, f:0.4, fb:2.2, gi:15},
+  "salade verte":    {c:1.7,  k:13,  p:1.3, f:0.2, fb:1.5, gi:10},
+  "roquette":        {c:2.1,  k:25,  p:2.6, f:0.7, fb:1.6, gi:10},
+  "cresson":         {c:1.3,  k:22,  p:2.3, f:0.3, fb:1.5, gi:10},
+  "betterave":       {c:9.6,  k:43,  p:1.6, f:0.1, fb:2.8, gi:64},
+  "poireau":         {c:5.2,  k:31,  p:1.5, f:0.3, fb:1.8, gi:15},
+  "oignon":          {c:7.9,  k:40,  p:1.1, f:0.1, fb:1.7, gi:10},
+  "oignon rouge":    {c:8.0,  k:41,  p:1.1, f:0.1, fb:1.6, gi:10},
+  "ail":             {c:28.5, k:135, p:6.4, f:0.5, fb:4.1, gi:30},
+  "asperge":         {c:3.5,  k:25,  p:2.2, f:0.2, fb:2.1, gi:15},
+  "artichaut":       {c:6.9,  k:47,  p:3.3, f:0.2, fb:5.4, gi:15},
+  "fenouil":         {c:4.2,  k:31,  p:1.2, f:0.2, fb:3.1, gi:15},
+  "radis":           {c:2.0,  k:16,  p:0.7, f:0.1, fb:1.6, gi:15},
+  "navet":           {c:4.6,  k:28,  p:0.9, f:0.1, fb:1.8, gi:72},
+  "panais":          {c:13.1, k:71,  p:1.3, f:0.5, fb:4.7, gi:52},
+  "mais":            {c:18.7, k:96,  p:3.2, f:1.4, fb:2.7, gi:60},
+  "petit pois":      {c:9.0,  k:69,  p:5.4, f:0.4, fb:5.7, gi:48},
+  "haricot vert":    {c:4.3,  k:31,  p:1.8, f:0.2, fb:3.4, gi:15},
+  "haricot blanc":   {c:11.6, k:100, p:7.1, f:0.4, fb:7.5, gi:33},
+  "lentilles":       {c:16.5, k:116, p:9.0, f:0.4, fb:7.9, gi:29},
+  "lentilles corail":{c:20.8, k:126, p:7.6, f:0.5, fb:4.2, gi:26},
+  "pois chiches":    {c:17.4, k:121, p:8.4, f:2.0, fb:7.2, gi:28},
+  "edamame":         {c:7.6,  k:122, p:11.9,f:5.2, fb:5.2, gi:18},
+  "champignon":      {c:0.3,  k:22,  p:3.1, f:0.3, fb:1.0, gi:10},
+  "champignon paris":{c:0.5,  k:22,  p:3.1, f:0.3, fb:1.0, gi:10},
+  "shiitake":        {c:10.6, k:41,  p:2.2, f:0.5, fb:2.5, gi:10},
+  "gingembre":       {c:15.8, k:80,  p:1.8, f:0.8, fb:2.0, gi:15},
+  "patisson":        {c:3.5,  k:22,  p:1.0, f:0.1, fb:1.5, gi:15},
+  "endive":          {c:2.9,  k:19,  p:1.0, f:0.2, fb:3.1, gi:15},
+  "persil":          {c:3.3,  k:36,  p:3.0, f:0.8, fb:3.3, gi:10},
+
+  // ── BOISSONS ────────────────────────────────────────
+  "eau":                  {c:0,    k:0,   p:0,   f:0,   fb:0,  gi:0},
+  "eau minerale":         {c:0,    k:0,   p:0,   f:0,   fb:0,  gi:0},
+  "eau gazeuse":          {c:0,    k:0,   p:0,   f:0,   fb:0,  gi:0},
+  "the":                  {c:0.3,  k:2,   p:0,   f:0,   fb:0,  gi:0},
+  "the vert":             {c:0.2,  k:1,   p:0.2, f:0,   fb:0,  gi:0},
+  "the noir":             {c:0.3,  k:2,   p:0.1, f:0,   fb:0,  gi:0},
+  "cafe":                 {c:0.2,  k:5,   p:0.3, f:0.1, fb:0,  gi:0},
+  "cafe sucre":           {c:10.0, k:45,  p:0.3, f:0.1, fb:0,  gi:65},
+  "lait entier":          {c:4.7,  k:65,  p:3.4, f:3.7, fb:0,  gi:27},
+  "lait demi ecreme":     {c:4.8,  k:48,  p:3.5, f:1.7, fb:0,  gi:27},
+  "lait ecreme":          {c:4.9,  k:35,  p:3.6, f:0.1, fb:0,  gi:27},
+  "lait de soja":         {c:3.3,  k:40,  p:3.4, f:2.0, fb:0.4,gi:34},
+  "lait d avoine":        {c:6.5,  k:47,  p:1.0, f:1.5, fb:0.5,gi:69},
+  "lait d amande":        {c:3.0,  k:30,  p:0.5, f:1.5, fb:0.5,gi:25},
+  "lait de coco":         {c:2.8,  k:197, p:2.0, f:21.0,fb:2.2,gi:40},
+  "jus orange":           {c:10.4, k:45,  p:0.7, f:0.2, fb:0.2,gi:52},
+  "jus pomme":            {c:11.5, k:47,  p:0.1, f:0.1, fb:0.1,gi:41},
+  "jus raisin":           {c:15.0, k:60,  p:0.6, f:0.1, fb:0.1,gi:55},
+  "jus ananas":           {c:12.9, k:53,  p:0.4, f:0.1, fb:0.2,gi:46},
+  "jus tomate":           {c:4.2,  k:17,  p:0.9, f:0.2, fb:0.6,gi:33},
+  "jus carotte":          {c:8.7,  k:38,  p:0.9, f:0.2, fb:0.7,gi:43},
+  "smoothie fruits":      {c:12.0, k:55,  p:0.7, f:0.2, fb:1.0,gi:50},
+  "coca cola":            {c:10.6, k:42,  p:0,   f:0,   fb:0,  gi:63},
+  "coca zero":            {c:0.1,  k:1,   p:0,   f:0,   fb:0,  gi:0},
+  "limonade":             {c:9.0,  k:36,  p:0,   f:0,   fb:0,  gi:62},
+  "sprite":               {c:8.9,  k:36,  p:0,   f:0,   fb:0,  gi:60},
+  "fanta orange":         {c:10.5, k:44,  p:0,   f:0,   fb:0,  gi:65},
+  "soda light":           {c:0.1,  k:1,   p:0,   f:0,   fb:0,  gi:0},
+  "sirop":                {c:70.0, k:280, p:0,   f:0,   fb:0,  gi:68},
+  "sirop dilue":          {c:7.0,  k:28,  p:0,   f:0,   fb:0,  gi:68},
+  "nectar abricot":       {c:12.0, k:53,  p:0.4, f:0.1, fb:0.5,gi:50},
+  "boisson energetique":  {c:11.0, k:45,  p:0.5, f:0,   fb:0,  gi:72},
+  "boisson isotonique":   {c:6.0,  k:25,  p:0,   f:0,   fb:0,  gi:60},
+  "biere":                {c:3.7,  k:43,  p:0.5, f:0,   fb:0,  gi:66},
+  "biere blonde":         {c:3.5,  k:42,  p:0.5, f:0,   fb:0,  gi:64},
+  "vin blanc":            {c:1.0,  k:70,  p:0.1, f:0,   fb:0,  gi:0},
+  "vin rouge":            {c:2.6,  k:75,  p:0.1, f:0,   fb:0,  gi:0},
+  "champagne":            {c:3.8,  k:80,  p:0.3, f:0,   fb:0,  gi:0},
+  "cidre":                {c:5.5,  k:46,  p:0.1, f:0,   fb:0,  gi:40},
+  "lait ribot":           {c:4.8,  k:44,  p:3.6, f:0.9, fb:0,  gi:27},
+  "kefir":                {c:4.7,  k:63,  p:3.4, f:3.5, fb:0,  gi:32},
+  "chocolat chaud":       {c:10.0, k:70,  p:3.5, f:3.0, fb:0.5,gi:40},
+  "ovomaltine":           {c:17.0, k:90,  p:4.5, f:2.5, fb:1.5,gi:55},
+  "nectar peche":         {c:11.0, k:47,  p:0.3, f:0.1, fb:0.3,gi:42},
+
+  // ── FÉCULENTS & CÉRÉALES ────────────────────────────
+  "pain":             {c:49.0, k:265, p:9.0, f:3.2, fb:2.7, gi:70},
+  "pain complet":     {c:43.0, k:241, p:9.5, f:3.0, fb:6.5, gi:50},
+  "pain seigle":      {c:45.8, k:258, p:8.5, f:3.3, fb:7.5, gi:48},
+  "pates":            {c:29.0, k:158, p:5.7, f:0.9, fb:1.8, gi:45},
+  "pates completes":  {c:27.5, k:149, p:5.3, f:0.8, fb:3.5, gi:37},
+  "riz":              {c:28.0, k:130, p:2.7, f:0.3, fb:0.4, gi:64},
+  "riz complet":      {c:23.5, k:112, p:2.5, f:1.0, fb:1.8, gi:55},
+  "riz basmati":      {c:25.0, k:121, p:2.5, f:0.3, fb:0.4, gi:50},
+  "quinoa":           {c:21.3, k:120, p:4.4, f:1.9, fb:2.8, gi:53},
+  "avoine":           {c:58.7, k:367, p:13.2,f:6.5, fb:10.6,gi:55},
+  "muesli":           {c:60.0, k:370, p:9.0, f:7.0, fb:7.0, gi:66},
+  "corn flakes":      {c:83.6, k:372, p:7.5, f:0.9, fb:3.3, gi:81},
+  "couscous":         {c:21.8, k:112, p:3.8, f:0.2, fb:1.4, gi:65},
+  "semoule":          {c:26.0, k:120, p:4.2, f:0.5, fb:1.5, gi:55},
+  "polenta":          {c:18.2, k:80,  p:1.8, f:0.5, fb:1.2, gi:70},
+  "tapioca":          {c:26.5, k:100, p:0.1, f:0.1, fb:0.2, gi:70},
+  "pain de mie":      {c:48.0, k:265, p:9.0, f:3.5, fb:2.5, gi:70},
+  "biscottes":        {c:72.0, k:396, p:10.0,f:5.5, fb:5.0, gi:70},
+  "baguette":         {c:52.0, k:280, p:9.5, f:1.5, fb:2.5, gi:72},
+  // ── PRODUITS LAITIERS & DIVERS ──────────────────────
+  "oeuf":             {c:0.3, k:155,  p:13.0,f:11.0,fb:0,   gi:0},
+  "yaourt":           {c:4.7, k:61,   p:3.5, f:3.3, fb:0,   gi:36},
+  "yaourt nature":    {c:4.7, k:61,   p:3.5, f:3.3, fb:0,   gi:36},
+  "yaourt grec":      {c:3.6, k:97,   p:9.0, f:5.0, fb:0,   gi:11},
+  "fromage blanc":    {c:3.8, k:80,   p:8.0, f:3.5, fb:0,   gi:30},
+  "fromage":          {c:0.5, k:402,  p:25.0,f:33.0,fb:0,   gi:0},
+  "miel":             {c:80.3,k:304,  p:0.3, f:0,   fb:0.2, gi:61},
+  "sucre":            {c:99.8,k:400,  p:0,   f:0,   fb:0,   gi:70},
+  "confiture":        {c:60.0,k:255,  p:0.5, f:0.2, fb:1.0, gi:51},
+  "chocolat noir":    {c:45.0,k:546,  p:5.0, f:32.0,fb:11.0,gi:23},
+  "chocolat au lait": {c:57.0,k:540,  p:7.0, f:30.0,fb:3.0, gi:43},
+  "nutella":          {c:57.5,k:539,  p:6.3, f:31.0,fb:3.5, gi:55}
+};
+
+// Mots-clés pour la détection automatique dans le texte IA
+const FKW = [
+  // Fruits
+  'pomme','poire','banane','raisin','orange','mandarine','pamplemousse','citron',
+  'fraise','framboise','mure','myrtille','cerise','abricot','peche','prune','nectarine',
+  'kiwi','ananas','mangue','papaye','melon','pasteque','figue','grenade','litchi',
+  'avocat','datte','pruneaux','raisin sec','fruit de la passion',
+  // Légumes
+  'carotte','tomate','pomme de terre','frites','patate douce','courge','courgette',
+  'aubergine','poivron','concombre','celeri','brocoli','chou','epinard','salade',
+  'betterave','poireau','oignon','ail','asperge','artichaut','fenouil','radis',
+  'navet','panais','mais','petit pois','haricot vert','haricot blanc',
+  'lentilles','pois chiches','edamame','champignon','endive','persil',
+  // Boissons
+  'eau','the','cafe','lait','jus orange','jus pomme','jus raisin','jus tomate',
+  'coca','soda','limonade','sirop','biere','vin','cidre','kefir','smoothie',
+  'boisson energetique','chocolat chaud','lait de soja','lait d avoine',
+  // Féculents & céréales
+  'pain','pates','riz','quinoa','avoine','muesli','corn flakes','couscous',
+  'semoule','polenta','baguette','biscottes',
+  // Protéines & laitiers
+  'oeuf','yaourt','fromage blanc','fromage','poulet','boeuf','porc','thon','saumon',
+  // Sucrants
+  'miel','sucre','confiture','chocolat','nutella'
+];
+
+async function searchOFF(q){
+  const k=q.toLowerCase().trim();if(ofc[k])return ofc[k];
+  try{
+    const r=await fetch(OFFURL+'?search_terms='+encodeURIComponent(k)+'&json=1&page_size=4&action=process&fields=product_name,nutriments,nutrition_grades',{signal:AbortSignal.timeout(6000)});
+    if(!r.ok)throw new Error();
+    const d=await r.json();
+    const ps=(d.products||[]).filter(p=>p.nutriments&&p.nutriments['carbohydrates_100g']!==undefined&&p.product_name).slice(0,3);
+    ofc[k]=ps;return ps;
+  }catch(e){return null;}
+}
+
+function offCard(p,src){
+  const n=p.nutriments||{};const name=p.product_name||'Produit';
+  const gr=(p.nutrition_grades||'?').toUpperCase();
+  const gc=['A','B','C','D','E'].includes(gr)?'n'+gr.toLowerCase():'nu';
+  function bar(l,v,m,cl){if(v===undefined||v===null)return '';const pt=Math.min(100,Math.round(v/m*100));return '<div class="om"><div class="oml">'+l+'</div><div class="omv">'+parseFloat(v).toFixed(1)+'g</div><div class="omb"><div class="omf '+cl+'" style="width:'+pt+'%"></div></div></div>';}
+  const cal=n['energy-kcal_100g'];
+  return '<div class="ofc"><div class="ofh"><div class="ofn">&#x1F957; '+name+'</div><span class="ofs">'+(src||'OFF')+'</span><span class="nsb '+gc+'">'+(gr==='?'?'?':gr)+'</span></div>'
+    +'<div style="font-size:.72rem;color:var(--muted);margin-bottom:8px">Pour 100g</div>'
+    +'<div class="ofm">'+bar('Glucides',n['carbohydrates_100g'],80,'bc')
+    +(cal?'<div class="om"><div class="oml">Energie</div><div class="omv">'+parseFloat(cal).toFixed(0)+' kcal</div><div class="omb"><div class="omf bk" style="width:'+Math.min(100,Math.round(cal/500*100))+'%"></div></div></div>':'')
+    +bar('Proteines',n['proteins_100g'],40,'bp')+bar('Lipides',n['fat_100g'],50,'bl')
+    +bar('Fibres',n['fiber_100g'],15,'bf')+bar('Sucres',n['sugars_100g'],60,'bs')+'</div>'
+    +'<div class="ofl">Open Food Facts (CC BY-SA) · Pesez vos aliments</div></div>';
+}
+
+function giLabel(gi){
+  if(gi===0||gi===undefined) return '';
+  const cls = gi<55 ? 'color:#34d399' : gi<70 ? 'color:#fbbf24' : 'color:#f87171';
+  const txt = gi<55 ? 'IG Bas' : gi<70 ? 'IG Moyen' : 'IG Eleve';
+  return '<span style="font-size:.68rem;padding:1px 6px;border-radius:6px;border:1px solid currentColor;'+cls+'">'+txt+' ('+gi+')</span>';
+}
+
+function calcPortion(d, grams){
+  // Calcule les valeurs pour une portion donnée
+  const f = grams / 100;
+  return {
+    c: Math.round(d.c * f * 10) / 10,
+    k: Math.round(d.k * f),
+    p: Math.round(d.p * f * 10) / 10,
+    fb: Math.round(d.fb * f * 10) / 10
+  };
+}
+
+function portionSelector(nm, d){
+  // Portions typiques selon catégorie
+  const portions = {
+    // Fruits (portion = 1 fruit moyen)
+    'pomme':150, 'poire':160, 'banane':120, 'orange':180, 'kiwi':80,
+    'peche':150, 'abricot':50, 'prune':60, 'cerise':100, 'fraise':150,
+    'raisin':100, 'melon':200, 'pasteque':200, 'ananas':120, 'mangue':150,
+    'figue':50, 'datte':24,
+    // Légumes (portion cuite)
+    'carotte':80, 'tomate':120, 'pomme de terre':150, 'courgette':100,
+    'brocoli':120, 'epinard':120, 'haricot vert':100, 'petit pois':80,
+    'betterave':80, 'mais':80,
+    // Boissons (1 verre = 200ml, 1 canette = 330ml)
+    'coca cola':330, 'biere':250, 'vin rouge':150, 'vin blanc':150,
+    'jus orange':200, 'jus pomme':200, 'lait entier':200, 'lait demi ecreme':200,
+    'the':200, 'cafe':80, 'chocolat chaud':200, 'sirop dilue':200,
+  };
+  const g = portions[nm] || 100;
+  const p = calcPortion(d, g);
+  const gi = d.gi || 0;
+  const cg = gi > 0 ? Math.round(gi * p.c / 100) : null;
+  return '<div style="background:rgba(56,189,248,0.06);border:1px solid rgba(56,189,248,0.15);border-radius:10px;padding:8px 10px;margin-top:8px;font-size:.78rem">'
+    +'<div style="color:var(--blue);font-weight:600;margin-bottom:5px">Portion typique : '+g+'g</div>'
+    +'<div style="display:flex;gap:10px;flex-wrap:wrap">'
+    +'<span style="color:var(--text)"><strong style="color:#f59e0b">'+p.c+'g</strong> glucides</span>'
+    +'<span style="color:var(--text)"><strong style="color:#ef4444">'+p.k+'</strong> kcal</span>'
+    +(cg!==null?'<span style="color:var(--text)">CG <strong style="color:'+(cg<11?'#34d399':cg<20?'#fbbf24':'#f87171')+'">'+cg+'</strong></span>':'')
+    +'</div></div>';
+}
+
+function ciqCard(nm, d){
+  function bar(l,v,m,cl){
+    if(v===undefined||v===null) return '';
+    const pt=Math.min(100,Math.round(v/m*100));
+    return '<div class="om"><div class="oml">'+l+'</div><div class="omv">'+v+'g</div>'
+      +'<div class="omb"><div class="omf '+cl+'" style="width:'+pt+'%"></div></div></div>';
+  }
+  const gi = d.gi || 0;
+  return '<div class="ofc">'
+    +'<div class="ofh"><div class="ofn">&#x1F957; '+nm.toUpperCase()+'</div>'
+    +'<span class="ofs">CIQUAL</span><span class="nsb nu">&#x2013;</span></div>'
+    +'<div style="display:flex;align-items:center;gap:6px;margin-bottom:8px">'
+    +'<span style="font-size:.72rem;color:var(--muted)">Pour 100g</span>'
+    +(gi>0?giLabel(gi):'')+'</div>'
+    +'<div class="ofm">'
+    +bar('Glucides',d.c,80,'bc')
+    +'<div class="om"><div class="oml">Energie</div><div class="omv">'+d.k+' kcal</div>'
+    +'<div class="omb"><div class="omf bk" style="width:'+Math.min(100,Math.round(d.k/500*100))+'%"></div></div></div>'
+    +bar('Proteines',d.p,40,'bp')
+    +bar('Fibres',d.fb,15,'bf')
+    +'</div>'
+    +portionSelector(nm, d)
+    +'<div class="ofl">CIQUAL / ANSES · Pesez vos aliments</div>'
+    +'</div>';
+}
+
+async function enrichOFF(txt,chat){
+  const tl=txt.toLowerCase();
+  const found=FKW.filter(k=>tl.includes(k)).slice(0,2);
+  if(!found.length)return;
+  const cont=document.createElement('div');cont.className='msg ai';
+  cont.innerHTML='<div class="off-sg">&#x1F50D; Interrogation Open Food Facts...</div>';
+  chat.appendChild(cont);requestAnimationFrame(()=>{chat.scrollTop=chat.scrollHeight;});
+  let html='';
+  for(const food of found){
+    const ps=await searchOFF(food);
+    if(ps&&ps.length)html+=offCard(ps[0]);
+    else if(CIQUAL[food])html+=ciqCard(food,CIQUAL[food]);
+  }
+  if(html)cont.innerHTML=html;else cont.remove();
+  requestAnimationFrame(()=>{chat.scrollTop=chat.scrollHeight;});
+}
+
+function showOFFSearch(){
+  const c=document.getElementById('cwin');const id='off'+Date.now();
+  const d=document.createElement('div');d.className='msg ai';d.id=id;
+  d.innerHTML='<div style="color:var(--green);font-weight:600;margin-bottom:6px">&#x1F957; Recherche Aliment</div>'
+    +'<div class="off-sw"><input type="text" class="off-si" id="ofsi-'+id+'" placeholder="Ex: nutella, pomme..." autocomplete="off" onkeydown="if(event.key===\'Enter\')runOFF(\''+id+'\')">'
+    +'<button class="off-sb" onclick="runOFF(\''+id+'\')">Chercher</button></div><div id="offr-'+id+'"></div>';
+  c.appendChild(d);
+  requestAnimationFrame(()=>{c.scrollTop=c.scrollHeight;setTimeout(()=>document.getElementById('off-si-'+id)?.focus(),150);});
+}
+
+async function runOFF(id){
+  const inp=document.getElementById('off-si-'+id);const res=document.getElementById('offr-'+id);
+  if(!inp||!res)return;const q=inp.value.trim();if(!q)return;
+  res.innerHTML='<div class="off-sg">&#x1F50D; Recherche...</div>';
+  const ps=await searchOFF(q);
+  if(ps&&ps.length){res.innerHTML=ps.slice(0,3).map(p=>offCard(p)).join('');}
+  else{const ck=Object.keys(CIQUAL).find(k=>q.toLowerCase().includes(k));if(ck)res.innerHTML=ciqCard(ck,CIQUAL[ck]);else res.innerHTML='<div style="color:#fca5a5;font-size:.82rem;margin-top:6px">Aucun resultat pour "'+q+'"</div>';}
+  requestAnimationFrame(()=>{document.getElementById('cwin').scrollTop=document.getElementById('cwin').scrollHeight;});
+}
+
+// ══════════════════════════════════════════════════════
+// ANALYSE ASSIETTE — Caméra + Pixtral + Calcul glucides
+// ══════════════════════════════════════════════════════
+let plateStream = null;
+let plateImageB64 = null;
+
+const CARB_PROMPT = `Tu es un expert en nutrition clinique et diabétologie (référentiel CIQUAL/ANSES 2024).
+Analyse cette photo d'assiette ou de repas avec PRÉCISION CHIRURGICALE.
+
+RÉPONDS UNIQUEMENT en JSON strict, sans markdown, sans texte avant/après :
+{
+  "aliments": [
+    {
+      "nom": "nom de l'aliment",
+      "portion_g": 150,
+      "glucides_g": 30.5,
+      "gi": 55,
+      "cg": 17,
+      "confiance": "haute|moyenne|faible"
+    }
+  ],
+  "glucides_total": 62.5,
+  "calories_total": 420,
+  "message_clinique": "Repas à IG moyen, pic glycémique attendu dans 45-60min.",
+  "conseil_insuline": "Bolus repas recommandé : estimez votre ratio I/G avec votre diabétologue.",
+  "avertissement": "Estimation visuelle — pesez vos aliments pour une précision optimale."
+}
+
+RÈGLES :
+- Identifie CHAQUE aliment visible, même les sauces, huile, pain
+- Estime le poids de chaque portion d'après la taille visuelle
+- Utilise les valeurs CIQUAL officielles pour les glucides
+- gi = index glycémique, cg = charge glycémique (gi × glucides / 100)
+- Si aliment non reconnu : confiance = "faible"
+- Réponds SEULEMENT en JSON valide`;
+
+async function openPlateModal() {
+  if (!key) { openM('mApi'); return; }
+  const modal = document.getElementById('plateModal');
+  modal.classList.add('on');
+  resetPlatePhases();
+  await startCamera();
+}
+
+function closePlateModal() {
+  stopCamera();
+  document.getElementById('plateModal').classList.remove('on');
+  plateImageB64 = null;
+}
+
+async function startCamera() {
+  const statusEl = document.getElementById('plateCamStatus');
+  statusEl.style.display = 'block';
+  statusEl.textContent = 'Activation de la caméra...';
+  document.getElementById('plateVideo').style.display = 'none';
+  document.getElementById('plateGuide').style.display = 'none';
+
+  try {
+    // Préférer caméra arrière (environment) sur mobile
+    const constraints = {
+      video: {
+        facingMode: { ideal: 'environment' },
+        width:  { ideal: 1920 },
+        height: { ideal: 1080 }
+      }
+    };
+    plateStream = await navigator.mediaDevices.getUserMedia(constraints);
+    const video = document.getElementById('plateVideo');
+    video.srcObject = plateStream;
+    video.style.display = 'block';
+    await video.play();
+    statusEl.style.display = 'none';
+    document.getElementById('plateGuide').style.display = 'block';
+
+  } catch(err) {
+    statusEl.style.display = 'block';
+    if (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError') {
+      statusEl.innerHTML = '⚠️ Caméra refusée.<br><br>'
+        + '<small>iOS : Réglages > Safari > Caméra = Autoriser<br>'
+        + 'Android : icône 🔒 > Caméra > Autoriser</small><br><br>'
+        + '<button onclick="useFallbackCamera()" style="background:var(--green);border:none;color:#000;padding:8px 16px;border-radius:10px;cursor:pointer;font-weight:600">📁 Choisir depuis la galerie</button>';
+    } else if (err.name === 'NotFoundError') {
+      statusEl.innerHTML = '⚠️ Aucune caméra détectée.<br><br>'
+        + '<button onclick="useFallbackCamera()" style="background:var(--green);border:none;color:#000;padding:8px 16px;border-radius:10px;cursor:pointer;font-weight:600">📁 Choisir depuis la galerie</button>';
+    } else {
+      // Fallback silencieux vers input caméra natif
+      useFallbackCamera();
+    }
+  }
+}
+
+function useFallbackCamera() {
+  // Fermer le modal et utiliser l'input capture natif
+  stopCamera();
+  document.getElementById('plateModal').classList.remove('on');
+  document.getElementById('fCam').click();
+}
+
+function stopCamera() {
+  if (plateStream) {
+    plateStream.getTracks().forEach(t => t.stop());
+    plateStream = null;
+  }
+  const video = document.getElementById('plateVideo');
+  video.srcObject = null;
+}
+
+function snapPhoto() {
+  const video   = document.getElementById('plateVideo');
+  const canvas  = document.getElementById('plateCanvas');
+  const preview = document.getElementById('platePreview');
+  const guide   = document.getElementById('plateGuide');
+
+  if (!video.videoWidth) return;
+
+  // Capturer le frame
+  canvas.width  = video.videoWidth;
+  canvas.height = video.videoHeight;
+  const ctx = canvas.getContext('2d');
+  ctx.drawImage(video, 0, 0);
+
+  // Compresser : max 1280px, qualité 0.82 (équilibre précision/taille API)
+  const maxW = 1280;
+  let w = canvas.width, h = canvas.height;
+  if (w > maxW) { h = Math.round(h * maxW / w); w = maxW; }
+  const small = document.createElement('canvas');
+  small.width = w; small.height = h;
+  small.getContext('2d').drawImage(canvas, 0, 0, w, h);
+  plateImageB64 = small.toDataURL('image/jpeg', 0.82);
+
+  // Afficher preview
+  preview.src = plateImageB64;
+  preview.style.display = 'block';
+  video.style.display = 'none';
+  if (guide) guide.style.display = 'none';
+  stopCamera();
+
+  // Passer en phase validation
+  document.getElementById('snapPhase').style.display = 'none';
+  document.getElementById('previewPhase').style.display = 'block';
+}
+
+function retakePhoto() {
+  const preview = document.getElementById('platePreview');
+  const video   = document.getElementById('plateVideo');
+  preview.style.display = 'none';
+  preview.src = '';
+  document.getElementById('previewPhase').style.display = 'none';
+  document.getElementById('snapPhase').style.display = 'block';
+  document.getElementById('plateGuide').style.display = 'none';
+  plateImageB64 = null;
+  startCamera();
+}
+
+function resetPlatePhases() {
+  document.getElementById('snapPhase').style.display = 'block';
+  document.getElementById('previewPhase').style.display = 'none';
+  document.getElementById('analyzingPhase').style.display = 'none';
+  document.getElementById('platePreview').style.display = 'none';
+  document.getElementById('platePreview').src = '';
+  document.getElementById('plateVideo').style.display = 'none';
+  document.getElementById('plateCamStatus').style.display = 'block';
+  document.getElementById('plateCamStatus').textContent = 'Activation...';
+  document.getElementById('plateGuide').style.display = 'none';
+}
+
+async function analyzePlate() {
+  if (!plateImageB64 || !key) return;
+
+  // Phase loading
+  document.getElementById('previewPhase').style.display = 'none';
+  document.getElementById('analyzingPhase').style.display = 'block';
+
+  try {
+    const resp = await fetch('https://api.mistral.ai/v1/chat/completions', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + key },
+      body: JSON.stringify({
+        model: 'pixtral-12b-2409',
+        messages: [{
+          role: 'user',
+          content: [
+            { type: 'text',      text: CARB_PROMPT },
+            { type: 'image_url', image_url: plateImageB64 }
+          ]
+        }],
+        temperature: 0.1,
+        max_tokens: 1200
+      })
+    });
+
+    if (!resp.ok) {
+      const e = await resp.json().catch(()=>({}));
+      throw new Error(e.message || 'HTTP ' + resp.status);
+    }
+
+    const data = await resp.json();
+    let raw = data.choices[0].message.content.trim();
+
+    // Nettoyer les éventuelles balises markdown autour du JSON
+    raw = raw.replace(/^```json\s*/i,'').replace(/^```\s*/,'').replace(/```\s*$/,'').trim();
+
+    let result;
+    try {
+      result = JSON.parse(raw);
+    } catch(e) {
+      // Tentative d'extraction JSON partielle
+      const m = raw.match(/\{[\s\S]+\}/);
+      if (m) result = JSON.parse(m[0]);
+      else throw new Error('Réponse JSON invalide');
+    }
+
+    closePlateModal();
+    renderCarbResult(result, plateImageB64);
+    plateImageB64 = null;
+
+  } catch(err) {
+    document.getElementById('analyzingPhase').style.display = 'none';
+    document.getElementById('previewPhase').style.display = 'block';
+    addMsg('❌ Erreur analyse : ' + err.message, 'ai');
+    closePlateModal();
+  }
+}
+
+function renderCarbResult(r, imgSrc) {
+  const chat = document.getElementById('cwin');
+
+  // Afficher la photo dans le chat
+  addMsgH('<img src="' + imgSrc + '" class="prev-img" alt="Assiette analysée">', 'usr');
+  addMsg('📸 Analyse glucides de votre assiette :', 'usr');
+
+  // Construire la carte résultat
+  const aliments = r.aliments || [];
+  const total    = r.glucides_total ?? aliments.reduce((s,a) => s + (a.glucides_g||0), 0);
+  const kcal     = r.calories_total || '';
+
+  // Couleur du total selon charge glycémique
+  const totalColor = total < 30 ? '#34d399' : total < 60 ? '#fbbf24' : '#f87171';
+
+  let rows = aliments.map(a => {
+    const gi = a.gi || 0;
+    const giCls = gi === 0 ? '' : gi < 55 ? 'carb-gi gi-lo' : gi < 70 ? 'carb-gi gi-mid' : 'carb-gi gi-hi';
+    const giTxt = gi === 0 ? '' : `<span class="carb-gi ${giCls}">IG ${gi}</span>`;
+    const conf  = a.confiance === 'faible' ? ' <span style="font-size:.65rem;color:#fbbf24">~</span>' : '';
+    return `<div class="carb-row">
+      <span class="carb-food">${a.nom}${conf} <small style="color:var(--muted)">${a.portion_g}g</small>${giTxt}</span>
+      <span class="carb-val">${parseFloat(a.glucides_g||0).toFixed(1)}g</span>
+    </div>`;
+  }).join('');
+
+  const html = `<div class="carb-result">
+    <div style="display:flex;align-items:baseline;gap:8px;margin-bottom:12px">
+      <span class="carb-total" style="color:${totalColor}">${parseFloat(total).toFixed(1)}</span>
+      <span class="carb-unit">g glucides</span>
+      ${kcal ? `<span style="font-size:.78rem;color:var(--muted);margin-left:4px">· ${kcal} kcal</span>` : ''}
+    </div>
+    <div style="font-size:.72rem;color:var(--muted);margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid rgba(255,255,255,.07)">
+      Détail par aliment
+    </div>
+    ${rows}
+    ${r.message_clinique ? `<div class="plate-tip" style="margin-top:10px;color:var(--blue)">${r.message_clinique}</div>` : ''}
+    ${r.conseil_insuline ? `<div class="plate-tip" style="color:#a78bfa">${r.conseil_insuline}</div>` : ''}
+    <div class="plate-tip">${r.avertissement || '⚠️ Estimation visuelle — pesez vos aliments pour une précision clinique.'}</div>
+  </div>`;
+
+  const d = document.createElement('div');
+  d.className = 'msg ai';
+  d.innerHTML = html;
+  chat.appendChild(d);
+  requestAnimationFrame(() => requestAnimationFrame(() => { chat.scrollTop = chat.scrollHeight; }));
+
+  // Ajouter à l'historique pour permettre le suivi conversationnel
+  const summary = `J'ai analysé une assiette : ${total.toFixed(1)}g de glucides total. Aliments : ${aliments.map(a=>a.nom+' ('+a.glucides_g+'g glucides)').join(', ')}.`;
+  hist.push({ role: 'assistant', content: summary });
+  try { localStorage.setItem('ov_h', JSON.stringify(hist)); } catch(e) {}
+}
+
+// Gérer la photo prise via input capture (fallback iOS/Android)
+document.getElementById('fCam').addEventListener('change', function(e) {
+  const file = e.target.files[0]; if (!file) return;
+  const reader = new FileReader();
+  reader.onload = async (ev) => {
+    plateImageB64 = ev.target.result;
+    e.target.value = '';
+    // Lancer directement l'analyse
+    const chat = document.getElementById('cwin');
+    addMsgH('<img src="' + plateImageB64 + '" class="prev-img" alt="Assiette">', 'usr');
+    addMsg('Analyse des glucides en cours...', 'ai');
+    try {
+      const resp = await fetch('https://api.mistral.ai/v1/chat/completions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + key },
+        body: JSON.stringify({
+          model: 'pixtral-12b-2409',
+          messages: [{ role: 'user', content: [
+            { type: 'text', text: CARB_PROMPT },
+            { type: 'image_url', image_url: plateImageB64 }
+          ]}],
+          temperature: 0.1, max_tokens: 1200
+        })
+      });
+      if (!resp.ok) throw new Error('HTTP ' + resp.status);
+      const data = await resp.json();
+      let raw = data.choices[0].message.content.trim()
+        .replace(/^```json\s*/i,'').replace(/^```\s*/,'').replace(/```\s*$/,'').trim();
+      const result = JSON.parse(raw.match(/\{[\s\S]+\}/)?.[0] || raw);
+      // Retirer le message "en cours"
+      const last = chat.lastElementChild;
+      if (last && last.textContent.includes('en cours')) last.remove();
+      renderCarbResult(result, plateImageB64);
+    } catch(err) {
+      const last = chat.lastElementChild;
+      if (last && last.textContent.includes('en cours')) last.remove();
+      addMsg('❌ Erreur analyse : ' + err.message, 'ai');
+    }
+    plateImageB64 = null;
+  };
+  reader.readAsDataURL(file);
+});
+
+</script>
+</body>
+</html>
