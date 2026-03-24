@@ -684,6 +684,8 @@ function saveBG(){
   addMsgH(html,'ai');
 
   if(bg < 70) setTimeout(()=>openHypo(bg), 300);
+  // Petit cooldown après saisie pour éviter une requête immédiate
+  apiCooldownUntil = Math.max(apiCooldownUntil, Date.now() + 1500);
 }
 
 // ══════════════════════════════════════════
@@ -786,51 +788,126 @@ function renderHist(){
 // ══════════════════════════════════════════
 // API MISTRAL — Retry 429 avec backoff
 // ══════════════════════════════════════════
-async function mistralFetch(body, maxRetries=2){
-  let delay = 8000;
-  for(let i=0; i<=maxRetries; i++){
-    const r = await fetch(API, {
+async function mistralFetch(body){
+  // ── File d'attente anti-rate-limit ──────────────────────────
+  // Attend si un cooldown est actif (après un 429 ou entre requêtes)
+  if(apiCooldownUntil > Date.now()){
+    const wait = apiCooldownUntil - Date.now();
+    showCooldown(Math.ceil(wait/1000));
+    await sleep(wait);
+    hideCooldown();
+  }
+
+  const r = await fetch(API, {
+    method:'POST',
+    headers:{'Content-Type':'application/json','Authorization':'Bearer '+key},
+    body: JSON.stringify(body),
+    signal: AbortSignal.timeout(35000)
+  });
+
+  if(r.ok){
+    // Succès → cooldown de 2s minimum entre requêtes (plan gratuit)
+    apiCooldownUntil = Date.now() + 2000;
+    return r;
+  }
+
+  if(r.status === 429){
+    // Lire Retry-After ou utiliser 65s par défaut (plan gratuit Mistral)
+    const ra   = r.headers.get('Retry-After');
+    const wait = ra ? parseInt(ra)*1000 : 65000;
+    apiCooldownUntil = Date.now() + wait;
+
+    // Afficher le compte à rebours dans le message loading
+    const el = document.getElementById('__ld__');
+    if(el){
+      let left = Math.ceil(wait/1000);
+      el.innerHTML = rateMsg(left);
+      const tick = setInterval(()=>{
+        left--;
+        if(el) el.innerHTML = rateMsg(left);
+        if(left<=0) clearInterval(tick);
+      },1000);
+    }
+    // Bloquer le bouton send pendant l'attente
+    showCooldown(Math.ceil(wait/1000));
+    await sleep(wait);
+    hideCooldown();
+
+    // Réessayer une seule fois
+    const r2 = await fetch(API, {
       method:'POST',
       headers:{'Content-Type':'application/json','Authorization':'Bearer '+key},
       body: JSON.stringify(body),
-      signal: AbortSignal.timeout(30000)
+      signal: AbortSignal.timeout(35000)
     });
-    if(r.ok) return r;
-
-    if(r.status === 429){
-      const ra   = r.headers.get('Retry-After');
-      const wait = ra ? parseInt(ra)*1000 : delay;
-      if(i < maxRetries){
-        const el = document.getElementById('__ld__');
-        if(el){
-          let left = Math.round(wait/1000);
-          const tick = setInterval(()=>{
-            left--;
-            if(el) el.innerHTML = '⏳ Quota API — réessai dans <strong style="color:var(--amb)">'+left+'s</strong>…<br><small style="color:var(--tx3);font-size:.7rem">Plan gratuit Mistral ≈ 1 req/min</small>';
-            if(left<=0) clearInterval(tick);
-          },1000);
-          el.innerHTML = '⏳ Quota API — réessai dans <strong style="color:var(--amb)">'+left+'s</strong>…<br><small style="color:var(--tx3);font-size:.7rem">Plan gratuit Mistral ≈ 1 req/min</small>';
-        }
-        await sleep(wait);
-        delay *= 2;
-        continue;
-      }
-      throw new Error('RATE_LIMIT');
-    }
-
-    if(r.status===401) throw new Error('AUTH_401');
-    const err = await r.json().catch(()=>({}));
-    throw new Error(err.message || 'HTTP '+r.status);
+    if(r2.ok){ apiCooldownUntil = Date.now() + 2000; return r2; }
+    if(r2.status===401) throw new Error('AUTH_401');
+    throw new Error('RATE_LIMIT');
   }
+
+  if(r.status===401) throw new Error('AUTH_401');
+  const err = await r.json().catch(()=>({}));
+  throw new Error(err.message || 'HTTP '+r.status);
+}
+
+function rateMsg(s){
+  return '⏳ Quota API — <strong style="color:var(--amb)">réessai dans '+s+'s</strong>'
+    +'<br><small style="color:var(--tx3);font-size:.7rem">Plan gratuit Mistral ≈ 1 req/min'
+    +' · <a href="https://console.mistral.ai" target="_blank" style="color:var(--mint)">Passer payant →</a></small>';
+}
+
+// ── Cooldown UI : barre de progression + bouton désactivé ──────
+let cooldownTimer = null;
+function showCooldown(seconds){
+  const btn = document.getElementById('uIn');
+  const snd = document.querySelector('.snd');
+  if(btn){ btn.placeholder = '⏳ Attente '+seconds+'s…'; btn.disabled=true; }
+  if(snd){ snd.style.opacity='.4'; snd.style.pointerEvents='none'; }
+
+  // Barre de progression dans le header
+  let bar = document.getElementById('apiBar');
+  if(!bar){
+    bar = document.createElement('div');
+    bar.id = 'apiBar';
+    bar.style.cssText = 'position:absolute;bottom:0;left:0;height:2px;background:var(--amb);transition:width 1s linear;width:100%;z-index:10';
+    document.querySelector('.hdr').style.position='relative';
+    document.querySelector('.hdr').appendChild(bar);
+  }
+  bar.style.width='100%';
+  let pct=100, step=100/seconds;
+  clearInterval(cooldownTimer);
+  cooldownTimer = setInterval(()=>{
+    pct -= step;
+    if(bar) bar.style.width=Math.max(0,pct)+'%';
+    if(pct<=0){
+      clearInterval(cooldownTimer);
+      hideCooldown();
+    }
+  },1000);
+}
+
+function hideCooldown(){
+  clearInterval(cooldownTimer);
+  const btn = document.getElementById('uIn');
+  const snd = document.querySelector('.snd');
+  if(btn){ btn.placeholder='Message…'; btn.disabled=false; }
+  if(snd){ snd.style.opacity=''; snd.style.pointerEvents=''; }
+  const bar = document.getElementById('apiBar');
+  if(bar){ bar.style.width='0%'; setTimeout(()=>bar.remove(),300); }
 }
 
 // ══════════════════════════════════════════
 // ENVOI MESSAGE & APPEL IA
 // ══════════════════════════════════════════
+// File d'attente : 1 requête à la fois
+let apiQueue     = Promise.resolve();
+let apiCooldownUntil = 0;
+
 function send(voice=false){
   const inp = document.getElementById('uIn');
   const t   = inp.value.trim();
   if(!t && !img64) return;
+  if(inp.disabled) return; // Bloquer si cooldown actif
   addMsg(t,'usr');
   inp.value='';
   hist.push({role:'user', content:t, date:Date.now()});
@@ -838,8 +915,15 @@ function send(voice=false){
   callAI(voice);
 }
 
+
 async function callAI(voice=false){
   if(!key){ openM('mApi'); return; }
+  // Chaîner dans la file d'attente pour éviter les requêtes simultanées
+  apiQueue = apiQueue.then(()=>_callAI(voice)).catch(()=>{});
+  return apiQueue;
+}
+
+async function _callAI(voice=false){
   const chat = document.getElementById('cwin');
   const ld = document.createElement('div');
   ld.className='msg ai'; ld.id='__ld__';
