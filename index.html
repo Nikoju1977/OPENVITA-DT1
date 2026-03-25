@@ -1,1419 +1,1755 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<title>OpenVita DT1 Pro</title>
-<meta name="theme-color" content="#050810">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="OpenVita">
-<link rel="manifest" href='data:application/manifest+json;charset=utf-8,{"name":"OpenVita DT1","short_name":"OpenVita","start_url":".","display":"standalone","background_color":"#050810","theme_color":"#050810","icons":[{"src":"data:image/svg+xml;charset=utf-8,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><circle cx=%2250%22 cy=%2250%22 r=%2250%22 fill=%22%2300e5a0%22/><text x=%2250%22 y=%2268%22 text-anchor=%22middle%22 font-size=%2250%22 fill=%22%23050810%22>D</text></svg>","sizes":"192x192","type":"image/svg+xml"}]}'>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<style>
-/* ══════════════════════════════════════════════════
-   OPENVITA DT1 PRO — Design System
-   Nicolas Julienne Labs · DM Mono + DM Sans
-   ══════════════════════════════════════════════════ */
-:root {
-  --h:100vh;
-  --ink:#050810; --ink2:#0d1221; --ink3:#151d30;
-  --ln:rgba(255,255,255,.07); --ln2:rgba(255,255,255,.12);
-  --tx:#eef0f5; --tx2:#8b93a8; --tx3:#50576a;
-  --mint:#00e5a0; --mintd:rgba(0,229,160,.12); --mintg:rgba(0,229,160,.06);
-  --blue:#4da6ff; --blued:rgba(77,166,255,.10);
-  --amb:#f59e0b; --ambd:rgba(245,158,11,.12);
-  --red:#f05252; --redd:rgba(240,82,82,.10);
-  --pur:#a78bfa; --purd:rgba(167,139,250,.10);
-  --rsm:8px; --rmd:14px; --rlg:20px; --rxl:26px;
-}
-@supports(height:100dvh){:root{--h:100dvh;}}
-*,*::before,*::after{box-sizing:border-box;-webkit-tap-highlight-color:transparent;margin:0;padding:0;}
-html{height:100%;overflow:hidden;}
-body{
-  position:fixed;inset:0;
-  background:var(--ink);color:var(--tx);
-  font-family:'DM Sans',system-ui,sans-serif;
-  font-size:15px;line-height:1.5;
-  overflow:hidden;width:100%;height:100%;
-}
-body::before{
-  content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
-  background:
-    radial-gradient(ellipse 60% 50% at 15% 10%,rgba(0,229,160,.07) 0%,transparent 60%),
-    radial-gradient(ellipse 50% 60% at 85% 90%,rgba(77,166,255,.05) 0%,transparent 60%);
-}
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>OpenVita DT1 Pro</title>
+  <meta name="theme-color" content="#020509">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="OpenVita">
+  <link rel="manifest" href='data:application/manifest+json;charset=utf-8,{"name":"OpenVita DT1","short_name":"OpenVita","start_url":".","display":"standalone","background_color":"#020509","theme_color":"#020509","icons":[{"src":"data:image/svg+xml;charset=utf-8,%3Csvg xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22 viewBox%3D%220 0 100 100%22%3E%3Ccircle cx%3D%2250%22 cy%3D%2250%22 r%3D%2250%22 fill%3D%22%2300e8a4%22%2F%3E%3C%2Fsvg%3E","sizes":"192x192","type":"image/svg+xml"}]}'>
 
-/* ── APP WRAPPER ── */
-#app{
-  position:relative;z-index:1;
-  width:100%;max-width:480px;height:100%;
-  margin:0 auto;
-  display:flex;flex-direction:column;overflow:hidden;
-  background:var(--ink2);
-  border-left:1px solid var(--ln);border-right:1px solid var(--ln);
-}
-@media(max-width:480px){#app{border:none;}}
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Exo+2:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;0,800;1,300&family=JetBrains+Mono:ital,wght@0,300;0,400;0,500;0,600;1,300&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
 
-/* ── MODALES ── */
-.modal{
-  display:none;position:fixed;inset:0;z-index:900;
-  background:rgba(5,8,16,.94);
-  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
-  align-items:center;justify-content:center;padding:16px;
-}
-.modal.on{display:flex;}
-.mc{
-  width:100%;max-width:430px;
-  background:var(--ink3);border:1px solid var(--ln2);border-radius:var(--rxl);
-  padding:22px 20px;
-  max-height:calc(var(--h) - 32px);overflow-y:auto;-webkit-overflow-scrolling:touch;
-}
-.mc h3{
-  font-family:'DM Mono',monospace;font-size:.8rem;font-weight:500;
-  color:var(--mint);letter-spacing:.08em;text-transform:uppercase;margin-bottom:10px;
-}
-.mc p{font-size:.84rem;color:var(--tx2);line-height:1.6;margin-bottom:8px;}
-.lbl{font-size:.76rem;color:var(--tx3);display:block;margin:9px 0 3px;}
-.fi{
-  width:100%;background:var(--ink);border:1px solid var(--ln2);
-  border-radius:var(--rmd);padding:11px 13px;color:var(--tx);
-  font-size:max(16px,.9rem);outline:none;transition:border-color .2s;
-}
-.fi:focus{border-color:var(--mint);}
-.fi::placeholder{color:var(--tx3);}
-.mc hr{border:none;border-top:1px solid var(--ln2);margin:16px 0 12px;}
-.bp{
-  width:100%;background:var(--mint);color:var(--ink);border:none;
-  border-radius:var(--rmd);padding:13px;font-weight:600;font-size:.9rem;
-  cursor:pointer;margin-top:10px;transition:opacity .2s;
-}
-.bp:active{opacity:.85;}
-.bs{
-  width:100%;background:transparent;color:var(--tx2);
-  border:1px solid var(--ln2);border-radius:var(--rmd);
-  padding:11px;font-size:.875rem;cursor:pointer;margin-top:7px;transition:opacity .2s;
-}
-.bs:active{opacity:.75;}
+  <style>
+    /* ════════════════════════════════════════════════════════
+       TOKENS
+    ════════════════════════════════════════════════════════ */
+    :root {
+      --h: 100vh;
+      --ink:  #020509;
+      --ink2: #060e1a;
+      --ink3: #0b1525;
+      --ink4: #101d30;
+      --ln:   rgba(255,255,255,.05);
+      --ln2:  rgba(255,255,255,.09);
+      --ln3:  rgba(255,255,255,.15);
+      --tx:   #e8edf6;
+      --tx2:  #6e7d99;
+      --tx3:  #384252;
+      --m:    #00e8a4;
+      --m-d:  rgba(0,232,164,.10);
+      --m-g:  rgba(0,232,164,.055);
+      --m-b:  rgba(0,232,164,.20);
+      --bl:   #4faaff;
+      --bl-d: rgba(79,170,255,.10);
+      --am:   #f59e0b;
+      --am-d: rgba(245,158,11,.10);
+      --am-b: rgba(245,158,11,.26);
+      --rd:   #f0505c;
+      --rd-d: rgba(240,80,92,.10);
+      --rd-b: rgba(240,80,92,.26);
+      --pu:   #a78bfa;
+      --pu-d: rgba(167,139,250,.10);
+      --pu-b: rgba(167,139,250,.22);
+      --r1: 6px;
+      --r2: 12px;
+      --r3: 18px;
+      --r4: 24px;
+      --fu: 'Exo 2', system-ui, sans-serif;
+      --fm: 'JetBrains Mono', 'Fira Code', monospace;
+    }
+    @supports (height: 100dvh) { :root { --h: 100dvh; } }
 
-/* ── HEADER ── */
-.hdr{
-  flex-shrink:0;
-  display:flex;align-items:center;justify-content:space-between;
-  padding:10px 14px;
-  padding-top:max(10px,env(safe-area-inset-top));
-  border-bottom:1px solid var(--ln);background:var(--ink2);
-}
-.brand{display:flex;align-items:baseline;gap:7px;}
-.brand h1{font-family:'DM Mono',monospace;font-size:.95rem;font-weight:500;color:var(--tx);}
-.brand h1 span{color:var(--mint);}
-.brand-tag{
-  font-family:'DM Mono',monospace;font-size:.6rem;color:var(--tx3);
-  padding:2px 6px;border:1px solid var(--ln2);border-radius:4px;
-}
-.hdr-btns{display:flex;align-items:center;gap:5px;}
-.hb{
-  display:flex;align-items:center;justify-content:center;
-  width:34px;height:34px;border-radius:50%;
-  background:transparent;border:1px solid var(--ln2);
-  color:var(--tx2);cursor:pointer;font-size:.9rem;transition:all .2s;
-}
-.hb:active{background:var(--ln2);}
-.pill-sos{
-  display:flex;align-items:center;gap:4px;
-  padding:6px 11px;border-radius:18px;
-  background:var(--redd);border:1px solid rgba(240,82,82,.3);
-  color:#f99;font-size:.74rem;font-weight:600;cursor:pointer;
-}
-.pill-hypo{
-  display:flex;align-items:center;gap:4px;
-  padding:6px 11px;border-radius:18px;
-  background:var(--ambd);border:1px solid rgba(245,158,11,.3);
-  color:var(--amb);font-size:.74rem;font-weight:600;cursor:pointer;
-}
-.dot-pulse{width:5px;height:5px;border-radius:50%;animation:blink 2s infinite;}
-@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+    /* ════════════════════════════════════════════════════════
+       RESET & BASE
+    ════════════════════════════════════════════════════════ */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+      margin: 0; padding: 0;
+    }
+    html { height: var(--h); height: 100%; overflow: hidden; }
+    body {
+      position: fixed; inset: 0; overflow: hidden;
+      width: 100%; height: 100%;
+      background: var(--ink);
+      color: var(--tx);
+      font-family: var(--fu);
+      font-size: 15px; line-height: 1.5;
+    }
+    body::before {
+      content: ''; position: fixed; inset: 0; pointer-events: none; z-index: 0;
+      background:
+        radial-gradient(ellipse 60% 45% at  7%  3%, rgba(0,232,164,.09) 0%, transparent 65%),
+        radial-gradient(ellipse 50% 60% at 93% 97%, rgba(79,170,255,.07) 0%, transparent 65%),
+        radial-gradient(ellipse 35% 28% at 80%  8%, rgba(167,139,250,.05) 0%, transparent 60%);
+    }
+    body::after {
+      content: ''; position: fixed; inset: 0; pointer-events: none; z-index: 0;
+      background-image: radial-gradient(circle, rgba(255,255,255,.028) 1px, transparent 1px);
+      background-size: 24px 24px;
+    }
 
-/* ── CHAT ── */
-#cwin{
-  flex:1;min-height:0;
-  overflow-y:auto;overflow-x:hidden;
-  -webkit-overflow-scrolling:touch;overscroll-behavior:contain;
-  padding:14px;
-  display:flex;flex-direction:column;gap:9px;
-}
-#cwin::-webkit-scrollbar{width:3px;}
-#cwin::-webkit-scrollbar-thumb{background:var(--ln2);border-radius:2px;}
+    /* ════════════════════════════════════════════════════════
+       APP SHELL
+    ════════════════════════════════════════════════════════ */
+    #app {
+      position: relative; z-index: 1;
+      margin: 0 auto;
+      width: 100%; max-width: 480px; height: 100%;
+      display: flex; flex-direction: column; overflow: hidden;
+      background: var(--ink2);
+      border-left: 1px solid var(--ln); border-right: 1px solid var(--ln);
+    }
+    @media (max-width: 480px) { #app { border: none; } }
 
-/* ── MESSAGES ── */
-.msg{
-  max-width:92%;min-width:0;
-  padding:11px 14px;border-radius:var(--rlg);
-  font-size:.9rem;line-height:1.6;
-  word-break:break-word;overflow-wrap:anywhere;
-}
-.ai{align-self:flex-start;background:var(--ink3);border:1px solid var(--ln2);border-bottom-left-radius:4px;}
-.usr{align-self:flex-end;background:var(--mintd);border:1px solid rgba(0,229,160,.18);border-bottom-right-radius:4px;}
-.msg strong{color:var(--tx);font-weight:600;}
-.msg em{color:var(--mint);}
-.msg h4{font-family:'DM Mono',monospace;font-size:.82rem;font-weight:500;color:var(--pur);letter-spacing:.04em;margin:8px 0 4px;}
-.msg code{font-family:'DM Mono',monospace;font-size:.82em;background:rgba(0,0,0,.4);border:1px solid var(--ln2);border-radius:4px;padding:1px 5px;color:var(--blue);}
-.msg ul{margin:5px 0 5px 16px;}.msg li{margin-bottom:2px;}
-.prev-img{max-width:100%;border-radius:var(--rmd);margin-top:8px;border:1px solid var(--ln2);display:block;}
+    /* ════════════════════════════════════════════════════════
+       MODALS — bottom-sheet
+    ════════════════════════════════════════════════════════ */
+    .modal {
+      display: none; position: fixed; inset: 0; z-index: 900;
+      background: rgba(2,5,9,.88);
+      backdrop-filter: blur(24px) saturate(1.4);
+      -webkit-backdrop-filter: blur(24px) saturate(1.4);
+      align-items: flex-end; justify-content: center;
+    }
+    .modal.on { display: flex; animation: bkIn .22s ease both; }
+    @keyframes bkIn { from { opacity: 0; } to { opacity: 1; } }
 
-/* Typing dots */
-.dots{display:inline-flex;gap:4px;align-items:center;}
-.dots span{width:5px;height:5px;border-radius:50%;background:var(--mint);opacity:.4;animation:db 1.2s infinite;}
-.dots span:nth-child(2){animation-delay:.2s}.dots span:nth-child(3){animation-delay:.4s}
-@keyframes db{0%,60%,100%{transform:translateY(0);opacity:.3}30%{transform:translateY(-5px);opacity:1}}
+    .mc {
+      width: 100%; max-width: 480px;
+      background: var(--ink3);
+      border: 1px solid var(--ln2); border-bottom: none;
+      border-radius: var(--r4) var(--r4) 0 0;
+      padding: 0 22px 40px;
+      max-height: 92vh; overflow-y: auto;
+      animation: shUp .3s cubic-bezier(.34,1.56,.64,1) both;
+    }
+    @keyframes shUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+    .mc::before {
+      content: ''; display: block;
+      width: 34px; height: 4px;
+      background: var(--ln3); border-radius: 2px;
+      margin: 14px auto 20px;
+    }
+    .mc h3 {
+      font-family: var(--fm); font-size: .65rem; font-weight: 500;
+      color: var(--m); letter-spacing: .14em; text-transform: uppercase;
+      margin-bottom: 14px; padding-top: 2px;
+    }
+    .mc p { font-size: .85rem; color: var(--tx2); line-height: 1.6; margin-bottom: 6px; }
+    .mc hr { border: none; border-top: 1px solid var(--ln2); margin: 20px 0 16px; }
+    .mc input {
+      width: 100%; background: var(--ink);
+      border: 1px solid var(--ln2); border-radius: var(--r2);
+      padding: 12px 14px; color: var(--tx);
+      font-size: 16px; font-family: var(--fm);
+      outline: none; margin: 7px 0;
+      transition: border-color .2s, box-shadow .2s;
+    }
+    .mc input:focus { border-color: var(--m); box-shadow: 0 0 0 3px var(--m-g); }
 
-/* ── INPUT BAR ── */
-.inpa{
-  flex-shrink:0;
-  display:flex;align-items:center;gap:6px;
-  padding:9px 13px;
-  padding-bottom:max(9px,env(safe-area-inset-bottom));
-  border-top:1px solid var(--ln);background:var(--ink);
-}
-.ib{
-  flex-shrink:0;display:flex;align-items:center;justify-content:center;
-  width:35px;height:35px;border-radius:50%;
-  background:transparent;border:1px solid var(--ln2);
-  color:var(--tx3);cursor:pointer;transition:all .2s;
-}
-.ib svg{width:16px;height:16px;fill:currentColor;}
-.ib:active{background:var(--ln2);}
-.ib.cam-btn{color:var(--mint);border-color:rgba(0,229,160,.3);background:var(--mintg);}
-.ib.bg-btn{color:var(--blue);border-color:rgba(77,166,255,.3);background:var(--blued);font-size:1rem;}
-.ib.mic-rec{color:var(--red);border-color:rgba(240,82,82,.4);animation:pulse 1s infinite alternate;}
-@keyframes pulse{0%{opacity:1}100%{opacity:.35}}
-#uIn{
-  flex:1;min-width:0;
-  background:var(--ink3);border:1px solid var(--ln2);
-  border-radius:20px;padding:10px 15px;
-  color:var(--tx);font-size:max(16px,.875rem);
-  outline:none;transition:border-color .2s;
-}
-#uIn:focus{border-color:var(--mint);}
-#uIn::placeholder{color:var(--tx3);}
-.snd{
-  flex-shrink:0;width:37px;height:37px;border-radius:50%;
-  background:var(--mint);border:none;
-  display:flex;align-items:center;justify-content:center;cursor:pointer;
-}
-.snd svg{width:16px;height:16px;fill:var(--ink);}
+    /* Stats modal centred */
+    #mStats { align-items: center; }
+    #mStats .mc {
+      border-radius: var(--r4); border-bottom: 1px solid var(--ln2);
+      max-height: 86vh; max-width: 95%;
+    }
 
-/* ── GLYCÉMIE CARD ── */
-.bg-card{
-  background:var(--ink3);border:1px solid var(--ln2);
-  border-radius:var(--rmd);padding:12px 14px;margin-top:6px;
-}
-.bg-big{font-family:'DM Mono',monospace;font-size:2rem;font-weight:500;line-height:1;}
-.c-ok{color:var(--mint)}.c-hi{color:var(--red)}.c-lo{color:var(--amb)}
-.data-row{
-  display:flex;justify-content:space-between;align-items:center;
-  padding:5px 0;border-bottom:1px solid var(--ln);font-size:.82rem;
-}
-.data-row:last-child{border:none;}
+    /* Buttons */
+    .btn-p {
+      width: 100%; background: var(--m); color: var(--ink); border: none;
+      border-radius: var(--r2); padding: 13px; margin-top: 10px;
+      font-family: var(--fu); font-weight: 700; font-size: .9rem; letter-spacing: .03em;
+      cursor: pointer; transition: opacity .15s, transform .1s;
+    }
+    .btn-p:active { transform: scale(.97); opacity: .88; }
+    .btn-s {
+      width: 100%; background: transparent; color: var(--tx2);
+      border: 1px solid var(--ln2); border-radius: var(--r2); padding: 11px; margin-top: 7px;
+      font-family: var(--fu); font-size: .875rem; cursor: pointer;
+      transition: border-color .2s, color .2s;
+    }
+    .btn-s:hover { border-color: var(--ln3); color: var(--tx); }
 
-/* ── BG MODAL quick buttons ── */
-.bq-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-top:8px;}
-.bq{
-  background:var(--ink);border:1px solid var(--ln2);border-radius:var(--rmd);
-  padding:8px 5px;text-align:center;cursor:pointer;font-size:.8rem;color:var(--tx2);
-  transition:border-color .15s;
-}
-.bq:active{border-color:var(--mint);color:var(--mint);}
-.bq.lo{border-color:rgba(245,158,11,.3);color:var(--amb);}
-.bq.hi{border-color:rgba(240,82,82,.3);color:var(--red);}
+    /* Toggle switch */
+    .toggle-row {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 12px 14px; background: var(--ink4);
+      border: 1px solid var(--ln2); border-radius: var(--r2); margin: 8px 0;
+    }
+    .toggle-row label { font-size: .875rem; color: var(--tx); cursor: pointer; }
+    .toggle-row span  { font-size: .75rem; color: var(--tx2); margin-top: 2px; display: block; }
+    .tog {
+      position: relative; width: 42px; height: 24px; flex-shrink: 0;
+      background: var(--ln3); border-radius: 12px; cursor: pointer;
+      transition: background .22s;
+    }
+    .tog.on { background: var(--m); }
+    .tog::after {
+      content: ''; position: absolute; top: 3px; left: 3px;
+      width: 18px; height: 18px; border-radius: 50%; background: #fff;
+      transition: left .22s cubic-bezier(.34,1.4,.64,1);
+    }
+    .tog.on::after { left: 21px; }
 
-/* ── HYPO MODAL ── */
-.hstep{
-  background:var(--ink);border:1px solid var(--ambd);border-left:3px solid var(--amb);
-  border-radius:var(--rmd);padding:10px 12px;font-size:.84rem;margin-bottom:8px;
-}
-.hypo-timer{
-  font-family:'DM Mono',monospace;font-size:2.4rem;font-weight:500;
-  color:var(--amb);text-align:center;padding:10px 0;letter-spacing:2px;
-}
+    /* ════════════════════════════════════════════════════════
+       HEADER
+    ════════════════════════════════════════════════════════ */
+    .hdr {
+      flex-shrink: 0;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 11px 14px 10px;
+      border-bottom: 1px solid var(--ln);
+      background: linear-gradient(180deg, rgba(6,14,26,.98) 0%, rgba(6,14,26,.9) 100%);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      position: relative; overflow: hidden;
+    }
+    .hdr::after {
+      content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 1px;
+      background: linear-gradient(90deg,
+        transparent 0%, rgba(0,232,164,.22) 40%,
+        rgba(0,232,164,.22) 60%, transparent 100%);
+    }
+    .hdr-left { display: flex; align-items: center; gap: 10px; min-width: 0; overflow: hidden; }
+    .logo-pill {
+      flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+      width: 36px; height: 36px;
+      background: linear-gradient(135deg, rgba(0,232,164,.16) 0%, rgba(0,232,164,.06) 100%);
+      border: 1px solid var(--m-b); border-radius: 11px;
+    }
+    .logo-pill svg { width: 18px; height: 18px; fill: var(--m); }
+    .brand { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
+    .brand-name {
+      font-family: var(--fu); font-size: 1rem; font-weight: 800;
+      color: var(--tx); line-height: 1; letter-spacing: .02em; white-space: nowrap;
+    }
+    .brand-name em { color: var(--m); font-style: normal; }
+    .brand-sub {
+      font-family: var(--fm); font-size: .54rem;
+      color: var(--tx3); letter-spacing: .11em; text-transform: uppercase;
+    }
+    #iobBadge {
+      display: none; align-items: center; gap: 4px;
+      padding: 3px 9px;
+      background: var(--pu-d); border: 1px solid var(--pu-b); border-radius: 16px;
+      font-family: var(--fm); font-size: .64rem; color: var(--pu); white-space: nowrap;
+      animation: iobPulse 2.8s ease-in-out infinite;
+    }
+    @keyframes iobPulse {
+      0%, 100% { box-shadow: 0 0 0 0   rgba(167,139,250,0); }
+      50%       { box-shadow: 0 0 0 4px rgba(167,139,250,.08); }
+    }
+    #bgChip {
+      display: none; align-items: center; gap: 4px;
+      padding: 3px 9px;
+      background: var(--m-d); border: 1px solid var(--m-b); border-radius: 16px;
+      font-family: var(--fm); font-size: .64rem; color: var(--m);
+      transition: color .3s, border-color .3s;
+    }
+    .hdr-right { display: flex; align-items: center; gap: 5px; flex-shrink: 0; }
+    .hbtn {
+      display: flex; align-items: center; justify-content: center;
+      width: 34px; height: 34px; border-radius: 50%;
+      background: transparent; border: 1px solid var(--ln2); color: var(--tx2);
+      cursor: pointer; font-size: .95rem;
+      transition: background .18s, border-color .18s, transform .1s;
+    }
+    .hbtn:active { transform: scale(.86); }
+    .hbtn.ai     { color: var(--pu); border-color: var(--pu-b); background: var(--pu-d); }
+    .hbtn.tts-on { color: var(--m);  border-color: var(--m-b);  background: var(--m-d); }
+    .hypo-pill {
+      display: flex; align-items: center; gap: 4px;
+      padding: 5px 11px; border-radius: 16px; cursor: pointer;
+      font-family: var(--fm); font-size: .65rem; font-weight: 600; letter-spacing: .07em;
+      background: var(--am-d); border: 1px solid var(--am-b); color: var(--am);
+      transition: background .18s, transform .1s;
+    }
+    .hypo-pill:active { transform: scale(.92); }
 
-/* ── CARB RESULT ── */
-.carb-card{
-  background:var(--ink3);border:1px solid rgba(0,229,160,.2);
-  border-radius:var(--rlg);padding:14px;margin-top:8px;
-  animation:fadeup .4s ease;
-}
-@keyframes fadeup{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
-.carb-total{
-  font-family:'DM Mono',monospace;font-size:2.2rem;font-weight:500;
-  letter-spacing:-1px;line-height:1;
-}
-.tip{
-  font-size:.77rem;color:var(--tx2);margin-top:8px;
-  padding:7px 9px;border-radius:var(--rsm);
-  background:rgba(255,255,255,.03);border-left:2px solid var(--mint);
-}
+    /* ════════════════════════════════════════════════════════
+       CHAT
+    ════════════════════════════════════════════════════════ */
+    #cwin {
+      flex: 1; min-height: 0; overflow-y: auto;
+      padding: 14px 13px; display: flex; flex-direction: column; gap: 7px;
+      -webkit-overflow-scrolling: touch;
+      scroll-behavior: smooth;
+    }
+    #cwin::-webkit-scrollbar { width: 3px; }
+    #cwin::-webkit-scrollbar-track { background: transparent; }
+    #cwin::-webkit-scrollbar-thumb { background: var(--ln2); border-radius: 2px; }
 
-/* ── OPEN FOOD FACTS ── */
-.ofc{
-  background:var(--ink3);border:1px solid rgba(0,229,160,.2);
-  border-radius:var(--rmd);padding:12px 14px;margin-top:8px;animation:fadeup .35s ease;
-}
-.ofh{display:flex;align-items:center;gap:6px;margin-bottom:8px;}
-.ofn{flex:1;min-width:0;font-weight:600;font-size:.85rem;color:var(--mint);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.ofs{font-family:'DM Mono',monospace;font-size:.62rem;color:var(--tx3);padding:2px 5px;border:1px solid var(--ln2);border-radius:4px;}
-.nsb{width:24px;height:24px;border-radius:5px;display:inline-flex;align-items:center;justify-content:center;font-weight:900;font-size:.8rem;color:white;flex-shrink:0;}
-.na{background:#1e8f4e}.nb{background:#7ac547}.nc{background:#ffc734;color:#333}
-.nd{background:#ef7d00}.ne{background:#e63312}.nu{background:#2d3555;color:#8b93a8}
-.ofm{display:grid;grid-template-columns:repeat(2,1fr);gap:5px;}
-.om{background:var(--ink);border-radius:var(--rsm);padding:7px 9px;border:1px solid var(--ln);}
-.oml{color:var(--tx3);font-size:.7rem;margin-bottom:2px;}
-.omv{font-family:'DM Mono',monospace;font-weight:500;font-size:.86rem;color:var(--tx);}
-.omb{height:2px;border-radius:1px;margin-top:3px;background:var(--ln2);overflow:hidden;}
-.omf{height:100%;border-radius:1px;transition:width .5s ease;}
-.bc{background:var(--amb)}.bk{background:var(--red)}.bp{background:var(--blue)}
-.bf{background:var(--mint)}.bl{background:var(--pur)}.bs{background:#fb923c}
-.ofl{font-size:.65rem;color:var(--tx3);margin-top:7px;padding-top:6px;border-top:1px solid var(--ln);}
-.off-sg{color:var(--tx3);font-size:.8rem;text-align:center;padding:8px;}
-.off-sw{display:flex;gap:6px;margin-top:8px;}
-.off-si{flex:1;min-width:0;background:var(--ink);border:1px solid var(--ln2);border-radius:var(--rmd);padding:8px 12px;color:var(--tx);font-size:max(16px,.85rem);outline:none;}
-.off-si:focus{border-color:var(--mint);}
-.off-sb{background:var(--mintd);border:1px solid rgba(0,229,160,.25);border-radius:var(--rmd);padding:8px 12px;color:var(--mint);font-size:.85rem;cursor:pointer;white-space:nowrap;}
+    .msg {
+      max-width: 92%; padding: 10px 13px 22px;
+      border-radius: var(--r3); font-size: .875rem; line-height: 1.65;
+      word-break: break-word; position: relative;
+      animation: msgIn .24s cubic-bezier(.34,1.56,.64,1) both;
+    }
+    @keyframes msgIn {
+      from { opacity: 0; transform: translateY(8px) scale(.96); }
+      to   { opacity: 1; transform: translateY(0)   scale(1);   }
+    }
+    .ai {
+      align-self: flex-start;
+      background: var(--ink3); border: 1px solid var(--ln2);
+      border-bottom-left-radius: 5px; color: var(--tx);
+    }
+    .usr {
+      align-self: flex-end;
+      background: linear-gradient(135deg, rgba(0,232,164,.13) 0%, rgba(0,232,164,.07) 100%);
+      border: 1px solid var(--m-b); border-bottom-right-radius: 5px; color: var(--tx);
+    }
+    .msg strong { font-weight: 700; color: var(--tx); }
+    .msg h4 { font-size: .95rem; color: var(--pu); margin: 10px 0 4px; font-weight: 600; }
+    .prev-img { max-width: 100%; border-radius: var(--r2); margin-top: 8px; border: 1px solid var(--ln2); }
 
-/* ── CAMERA MODAL ── */
-.cam-modal{display:none;position:fixed;inset:0;z-index:800;background:#000;flex-direction:column;}
-.cam-modal.on{display:flex;}
-.cam-hdr{
-  flex-shrink:0;display:flex;align-items:center;justify-content:space-between;
-  padding:12px 16px;padding-top:max(12px,env(safe-area-inset-top));
-  background:rgba(5,8,16,.9);border-bottom:1px solid var(--ln);
-}
-.cam-vp{flex:1;min-height:0;position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center;background:#000;}
-#plateVideo{width:100%;height:100%;object-fit:cover;display:none;}
-#plateCanvas{display:none;}
-#platePreview{display:none;max-width:100%;max-height:100%;object-fit:contain;}
-#camStatus{position:absolute;color:var(--tx2);font-size:.85rem;text-align:center;padding:20px;line-height:1.6;}
-.cam-guide{
-  position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
-  width:82%;aspect-ratio:4/3;
-  border:1.5px dashed rgba(0,229,160,.4);border-radius:var(--rlg);
-  pointer-events:none;display:none;
-}
-.cam-guide::after{
-  content:'Cadrez votre assiette';
-  position:absolute;bottom:-26px;left:50%;transform:translateX(-50%);
-  font-size:.7rem;color:rgba(0,229,160,.6);white-space:nowrap;
-  font-family:'DM Mono',monospace;
-}
-.cam-ctrl{
-  flex-shrink:0;padding:14px;
-  padding-bottom:max(14px,env(safe-area-inset-bottom));
-  background:rgba(5,8,16,.9);border-top:1px solid var(--ln);text-align:center;
-}
-.snap-btn{
-  width:58px;height:58px;border-radius:50%;
-  background:var(--mint);border:none;
-  display:inline-flex;align-items:center;justify-content:center;cursor:pointer;
-  box-shadow:0 0 0 5px rgba(0,229,160,.15),0 0 0 10px rgba(0,229,160,.06);
-}
-.snap-btn svg{width:24px;height:24px;fill:var(--ink);}
-.cam-actions{display:flex;gap:10px;justify-content:center;}
-.cam-retake{padding:10px 18px;border-radius:var(--rmd);background:rgba(255,255,255,.08);border:1px solid var(--ln2);color:var(--tx2);cursor:pointer;font-size:.85rem;}
-.cam-analyze{padding:10px 22px;border-radius:var(--rmd);background:var(--mint);border:none;color:var(--ink);font-weight:600;cursor:pointer;}
+    /* Timestamp + speak button inside bubble */
+    .msg-foot {
+      position: absolute; bottom: 6px; left: 13px; right: 8px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .msg-ts {
+      font-family: var(--fm); font-size: .56rem; color: var(--tx3); letter-spacing: .04em;
+    }
+    .speak-btn {
+      width: 20px; height: 20px; border: none; border-radius: 50%;
+      background: transparent; color: var(--tx3); cursor: pointer;
+      display: flex; align-items: center; justify-content: center; font-size: .72rem;
+      transition: color .15s;
+    }
+    .speak-btn:hover { color: var(--m); }
+    .speak-btn.speaking { color: var(--m); animation: spkPulse .7s ease-in-out infinite; }
+    @keyframes spkPulse { 0%,100% { opacity: 1; } 50% { opacity: .4; } }
 
-/* ── STATS ── */
-.stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px;}
-.stat-box{background:var(--ink);border:1px solid var(--ln2);border-radius:var(--rmd);padding:8px;text-align:center;}
-.stat-lbl{font-size:.66rem;color:var(--tx3);margin-bottom:3px;text-transform:uppercase;letter-spacing:.04em;}
-.stat-val{font-family:'DM Mono',monospace;font-size:.98rem;font-weight:500;}
-</style>
+    /* Typing dots */
+    .dots { display: inline-flex; gap: 4px; align-items: center; }
+    .dots span {
+      width: 5px; height: 5px; border-radius: 50%;
+      background: var(--m); opacity: .4;
+      animation: db 1.2s infinite;
+    }
+    .dots span:nth-child(2) { animation-delay: .2s; }
+    .dots span:nth-child(3) { animation-delay: .4s; }
+    @keyframes db {
+      0%, 60%, 100% { transform: translateY(0); opacity: .3; }
+      30%            { transform: translateY(-5px); opacity: 1; }
+    }
+
+    /* ════════════════════════════════════════════════════════
+       INPUT BAR
+    ════════════════════════════════════════════════════════ */
+    .inpa-wrap { flex-shrink: 0; position: relative; }
+    #interimText {
+      display: none; position: absolute; bottom: 100%; left: 14px; right: 14px;
+      background: var(--ink4); border: 1px solid var(--m-b); border-radius: var(--r2);
+      padding: 9px 13px; margin-bottom: 6px;
+      font-size: .82rem; color: var(--m); font-family: var(--fm);
+      animation: fadeSlide .2s ease both; z-index: 10;
+    }
+    @keyframes fadeSlide {
+      from { opacity: 0; transform: translateY(4px); }
+      to   { opacity: 1; transform: translateY(0);   }
+    }
+    .inpa {
+      display: flex; align-items: center; gap: 6px;
+      padding: 9px 12px;
+      padding-bottom: max(9px, env(safe-area-inset-bottom));
+      border-top: 1px solid var(--ln);
+      background: linear-gradient(0deg, var(--ink) 0%, rgba(6,14,26,.97) 100%);
+    }
+    .ibtn {
+      flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+      width: 36px; height: 36px; border-radius: 50%;
+      background: transparent; border: 1px solid var(--ln2); color: var(--tx3);
+      cursor: pointer; font-size: 1rem;
+      transition: background .18s, border-color .18s, transform .1s;
+    }
+    .ibtn svg { width: 16px; height: 16px; fill: currentColor; }
+    .ibtn:active { transform: scale(.85); }
+    .ibtn.cam { color: var(--m);  border-color: var(--m-b);  background: var(--m-g); }
+    .ibtn.bg  { color: var(--rd); border-color: var(--rd-b); }
+    .ibtn.mic { color: var(--tx2); }
+    .ibtn.mic.rec {
+      color: var(--rd); border-color: var(--rd-b); background: var(--rd-d);
+      animation: micPulse .9s ease-in-out infinite;
+    }
+    @keyframes micPulse {
+      0%, 100% { box-shadow: 0 0 0 0   rgba(240,80,92,0); }
+      50%       { box-shadow: 0 0 0 6px rgba(240,80,92,.18); }
+    }
+    #uIn {
+      flex: 1; min-width: 0;
+      background: var(--ink3); border: 1px solid var(--ln2); border-radius: 22px;
+      padding: 10px 16px; color: var(--tx);
+      font-family: var(--fu); font-size: max(16px, .875rem);
+      outline: none; transition: border-color .2s, box-shadow .2s;
+    }
+    #uIn:focus { border-color: rgba(0,232,164,.28); box-shadow: 0 0 0 3px var(--m-g); }
+    #uIn::placeholder { color: var(--tx3); }
+    .send-btn {
+      flex-shrink: 0; width: 38px; height: 38px; border-radius: 50%;
+      background: var(--m); border: none;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; transition: opacity .15s, transform .1s;
+    }
+    .send-btn:active { transform: scale(.86); opacity: .86; }
+    .send-btn svg { width: 16px; height: 16px; fill: var(--ink); }
+
+    /* ════════════════════════════════════════════════════════
+       CARB / BOLUS CARD
+    ════════════════════════════════════════════════════════ */
+    .carb-result {
+      background: var(--ink4); border: 1px solid rgba(0,232,164,.17);
+      border-radius: var(--r3); padding: 14px; margin-top: 6px;
+    }
+    .carb-total {
+      font-family: var(--fm); font-size: 2.2rem; font-weight: 300;
+      color: var(--m); line-height: 1; margin-bottom: 8px;
+    }
+    .carb-total span { font-size: .82rem; color: var(--tx3); margin-left: 7px; font-weight: 400; }
+    .carb-rows { margin-bottom: 4px; }
+    .carb-row {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 6px 0; border-bottom: 1px solid var(--ln); font-size: .82rem;
+    }
+    .carb-rows .carb-row:last-child { border-bottom: none; }
+    .carb-row span:last-child { font-family: var(--fm); color: var(--m); }
+    .plate-tip {
+      font-size: .82rem; color: var(--bl); font-weight: 600;
+      margin-top: 12px; padding: 9px 12px;
+      border-radius: var(--r1) var(--r2) var(--r2) var(--r1);
+      background: var(--bl-d); border-left: 3px solid var(--bl);
+    }
+    .iob-note {
+      font-size: .7rem; color: var(--tx2);
+      margin-top: 6px; font-weight: 400;
+      padding: 5px 8px; background: var(--pu-d);
+      border-radius: var(--r1); border-left: 2px solid var(--pu-b);
+    }
+    .iob-btn {
+      background: var(--pu-d); color: var(--pu);
+      border: 1px solid var(--pu-b); border-radius: var(--r1);
+      padding: 10px 12px; width: 100%;
+      font-family: var(--fu); font-weight: 700; cursor: pointer;
+      margin-top: 9px; font-size: .85rem;
+      transition: background .18s, transform .1s;
+    }
+    .iob-btn:active { transform: scale(.98); }
+    .iob-btn:disabled { opacity: .42; cursor: default; transform: none; }
+
+    /* ════════════════════════════════════════════════════════
+       CAMERA MODAL
+    ════════════════════════════════════════════════════════ */
+    .plate-modal {
+      display: none; position: fixed; inset: 0; z-index: 800;
+      background: #000; flex-direction: column;
+    }
+    .plate-modal.on { display: flex; }
+    .plate-hdr {
+      flex-shrink: 0; display: flex; align-items: center; justify-content: space-between;
+      padding: 13px 18px; background: rgba(2,5,9,.92); border-bottom: 1px solid var(--ln);
+    }
+    .plate-lbl {
+      font-family: var(--fm); font-size: .65rem; color: var(--m);
+      letter-spacing: .13em; text-transform: uppercase;
+    }
+    .plate-close {
+      background: transparent; border: none; color: var(--tx2);
+      font-size: 1.25rem; cursor: pointer;
+      width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;
+    }
+    .plate-vp {
+      flex: 1; position: relative; overflow: hidden;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .plate-vp::before {
+      content: ''; position: absolute; z-index: 2;
+      width: 220px; height: 220px;
+      border: 2px solid rgba(0,232,164,.5); border-radius: var(--r3);
+      box-shadow: 0 0 0 9999px rgba(0,0,0,.42);
+      pointer-events: none;
+    }
+    #plateVideo { width: 100%; height: 100%; object-fit: cover; display: none; }
+    #plateCanvas { display: none; }
+    #platePreview { display: none; max-width: 100%; max-height: 100%; object-fit: contain; }
+    .plate-ctrl {
+      flex-shrink: 0; padding: 20px 16px;
+      background: rgba(2,5,9,.92); border-top: 1px solid var(--ln); text-align: center;
+    }
+    .snap-btn {
+      width: 66px; height: 66px; border-radius: 50%;
+      background: var(--m); border: 5px solid rgba(0,232,164,.24);
+      display: inline-flex; align-items: center; justify-content: center;
+      cursor: pointer; transition: transform .1s;
+    }
+    .snap-btn:active { transform: scale(.88); }
+    .snap-btn svg { width: 26px; height: 26px; fill: var(--ink); }
+    .plate-actions { display: flex; gap: 10px; justify-content: center; }
+    .plate-retake {
+      padding: 11px 18px; border-radius: var(--r2);
+      background: var(--ink3); border: 1px solid var(--ln2); color: var(--tx2);
+      font-family: var(--fu); font-size: .875rem; cursor: pointer;
+    }
+    .plate-analyze {
+      padding: 11px 24px; border-radius: var(--r2);
+      background: var(--m); border: none; color: var(--ink);
+      font-family: var(--fu); font-weight: 700; cursor: pointer;
+    }
+    .plate-analyzing {
+      font-family: var(--fm); font-size: .75rem;
+      color: var(--tx2); letter-spacing: .07em;
+    }
+    #patientBadge {
+      display: none; align-items: center; gap: 4px;
+      padding: 3px 9px;
+      background: var(--bl-d); border: 1px solid rgba(79,170,255,.22); border-radius: 16px;
+      font-family: var(--fm); font-size: .64rem; color: var(--bl); white-space: nowrap;
+    }
+    .suggest-card {
+      background: var(--ink4); border: 1px solid var(--m-b); border-radius: var(--r2);
+      padding: 12px 14px; margin: 10px 0; font-size: .8rem;
+    }
+    .suggest-card strong { color: var(--m); display: block; margin-bottom: 6px; font-family: var(--fm); letter-spacing: .06em; text-transform: uppercase; font-size: .65rem; }
+    .suggest-row { display: flex; justify-content: space-between; align-items: center; padding: 3px 0; color: var(--tx2); }
+    .suggest-row span:last-child { color: var(--tx); font-family: var(--fm); }
+    .btn-suggest {
+      width: 100%; background: var(--bl-d); color: var(--bl);
+      border: 1px solid rgba(79,170,255,.3); border-radius: var(--r2);
+      padding: 10px; margin-top: 8px; font-family: var(--fu); font-size: .85rem;
+      font-weight: 600; cursor: pointer; transition: opacity .15s;
+    }
+    .btn-suggest:active { opacity: .75; }
+    .bolus-warn {
+      font-size: .72rem; color: var(--am); margin-top: 6px; padding: 5px 9px;
+      background: var(--am-d); border-radius: var(--r1); border-left: 2px solid var(--am-b);
+    }
+  </style>
 </head>
 <body>
 
-<!-- MODAL PARAMÈTRES -->
+<!-- ════ SETTINGS MODAL ═══════════════════════════════════════════════════ -->
 <div class="modal" id="mApi">
   <div class="mc">
-    <h3>Clé API Mistral</h3>
-    <p>Stockée localement. <a href="https://console.mistral.ai/api-keys" target="_blank" style="color:var(--mint)">Obtenir une clé →</a></p>
-    <input type="password" class="fi" id="apiIn" placeholder="sk-xxxxxxxx…" autocomplete="off">
-    <div id="apiRes" style="font-size:.8rem;margin-top:6px;padding:8px 10px;border-radius:var(--rsm);display:none"></div>
+    <h3>&#x1F511; Cl&#xe9; API Mistral</h3>
+    <input type="password" id="apiIn" placeholder="sk-xxxxxxxxxxxxxxxx" autocomplete="off" spellcheck="false">
+    <div id="apiTestResult" style="font-size:.78rem;margin-top:6px;padding:8px;border-radius:8px;display:none;"></div>
+
     <hr>
-    <h3>Profil Diabète T1</h3>
-    <label class="lbl">Ratio I/G — ICR (1U pour X g glucides)</label>
-    <input type="number" class="fi" id="icrIn" placeholder="Ex: 10" min="1" max="50">
-    <label class="lbl">Sensibilité — ISF (1U baisse de X mg/dL)</label>
-    <input type="number" class="fi" id="isfIn" placeholder="Ex: 40" min="5" max="200">
-    <label class="lbl">Glycémie cible (mg/dL)</label>
-    <input type="number" class="fi" id="tgtIn" placeholder="Ex: 100" min="60" max="180">
-    <label class="lbl">Durée action insuline — DIA (heures)</label>
-    <input type="number" class="fi" id="diaIn" placeholder="Ex: 4" min="2" max="8" step="0.5">
-    <button class="bp" onclick="saveSettings()">💾 Sauvegarder &amp; Tester</button>
+    <h3>&#x1F9D1; Profil Patient</h3>
+    <p style="font-size:.78rem;margin-bottom:3px;">Pr&#xe9;nom (facultatif) :</p>
+    <input type="text" id="prenomIn" placeholder="Ex : Emma" maxlength="30" autocomplete="off">
+    <p style="font-size:.78rem;margin-bottom:3px;">&#xC2;ge (ann&#xe9;es) :</p>
+    <input type="number" id="ageIn" placeholder="Ex : 8" min="1" max="100">
+    <p style="font-size:.78rem;margin-bottom:3px;">Poids (kg) :</p>
+    <input type="number" id="poidsIn" placeholder="Ex : 32" min="5" max="200">
+    <div id="suggestCard" class="suggest-card" style="display:none;">
+      <strong>&#x1F9EE; Calcul&#xe9; depuis le poids (R&#xe8;gles 500/1800)</strong>
+      <div class="suggest-row"><span>TDD estim&#xe9;</span><span id="sug_tdd">&#x2014;</span></div>
+      <div class="suggest-row"><span>ICR sugg&#xe9;r&#xe9; (g/U)</span><span id="sug_icr">&#x2014;</span></div>
+      <div class="suggest-row"><span>ISF sugg&#xe9;r&#xe9; (mg/dL/U)</span><span id="sug_isf">&#x2014;</span></div>
+      <div class="suggest-row"><span>Bolus max s&#xe9;curit&#xe9;</span><span id="sug_max">&#x2014;</span></div>
+      <button class="btn-suggest" onclick="applyCalcSuggest()">&#x2705; Appliquer ces valeurs</button>
+    </div>
+
     <hr>
-    <h3>Données</h3>
-    <button class="bs" onclick="exportData()">⬇️ Exporter (.json)</button>
-    <button class="bs" onclick="document.getElementById('importFile').click()">⬆️ Importer (.json)</button>
+    <h3>&#x1FA7A; Profil Diab&#xe8;te DT1</h3>
+    <p style="font-size:.78rem;margin-bottom:3px;">Ratio Insuline/Glucides &#x2014; 1 U pour X g :</p>
+    <input type="number" id="icrIn" placeholder="Ex : 10" min="1" max="50">
+    <p style="font-size:.78rem;margin-bottom:3px;">Sensibilit&#xe9; &#x2014; 1 U baisse de X mg/dL :</p>
+    <input type="number" id="isfIn" placeholder="Ex : 40" min="5" max="200">
+    <p style="font-size:.78rem;margin-bottom:3px;">Glyc&#xe9;mie cible (mg/dL) :</p>
+    <input type="number" id="targetBgIn" placeholder="Ex : 100" min="60" max="200">
+    <p style="font-size:.78rem;margin-bottom:3px;">Dur&#xe9;e d'action insuline DIA (heures) :</p>
+    <input type="number" id="diaIn" placeholder="Ex : 4" min="2" max="8">
+
+    <hr>
+    <h3>&#x1F50A; Param&#xe8;tres vocaux</h3>
+    <div class="toggle-row">
+      <div>
+        <label>Lecture auto des r&#xe9;ponses IA</label>
+        <span>L'assistant lit &#xe0; voix haute ses r&#xe9;ponses</span>
+      </div>
+      <div class="tog" id="togTTS" onclick="toggleTTS()"></div>
+    </div>
+
+    <hr>
+    <h3>&#x1F4BE; Donn&#xe9;es</h3>
+    <button class="btn-s" onclick="exportData()">&#x2B07;&#xFE0F; Exporter historique (.json)</button>
+    <button class="btn-s" onclick="document.getElementById('importFile').click()">&#x2B06;&#xFE0F; Importer historique</button>
     <input type="file" id="importFile" style="display:none" accept=".json" onchange="importData(event)">
-    <button class="bs" onclick="if(confirm('Effacer TOUTES les données ?')){try{localStorage.clear();}catch(e){}location.reload();}">🗑️ Effacer tout</button>
-    <button class="bs" onclick="closeM('mApi')">Fermer</button>
+
+    <button class="btn-p" onclick="saveSettings()">Sauvegarder le profil</button>
+    <button class="btn-s" onclick="closeM('mApi')">Fermer</button>
   </div>
 </div>
 
-<!-- MODAL GLYCÉMIE (remplace prompt() natif) -->
-<div class="modal" id="mBG">
-  <div class="mc">
-    <h3>🩸 Saisir la Glycémie</h3>
-    <label class="lbl">Valeur (mg/dL)</label>
-    <input type="number" class="fi" id="bgIn" placeholder="Ex: 125" min="20" max="600"
-           onkeydown="if(event.key==='Enter')saveBG()">
-    <label class="lbl">Glucides du repas (g) — optionnel</label>
-    <input type="number" class="fi" id="bgCarbsIn" placeholder="Ex: 45" min="0">
-    <label class="lbl">Bolus injecté (U) — optionnel</label>
-    <input type="number" class="fi" id="bgBolusIn" placeholder="Ex: 3.5" step="0.5" min="0">
-    <div style="font-size:.74rem;color:var(--tx3);margin-top:10px;margin-bottom:4px">Raccourcis :</div>
-    <div class="bq-grid">
-      <div class="bq lo" onclick="setBGQ(55)">HYPO<br><small>55</small></div>
-      <div class="bq lo" onclick="setBGQ(65)">BAS<br><small>65</small></div>
-      <div class="bq"    onclick="setBGQ(80)">80</div>
-      <div class="bq"    onclick="setBGQ(100)">100</div>
-      <div class="bq"    onclick="setBGQ(130)">130</div>
-      <div class="bq hi" onclick="setBGQ(200)">HAUT<br><small>200</small></div>
-    </div>
-    <button class="bp" onclick="saveBG()">Enregistrer</button>
-    <button class="bs" onclick="closeM('mBG')">Annuler</button>
-  </div>
-</div>
-
-<!-- MODAL HYPO -->
-<div class="modal" id="mHypo">
-  <div class="mc">
-    <h3 style="color:var(--amb)">🟡 Protocole Hypoglycémie 15/15</h3>
-    <div class="hstep">
-      <strong style="color:var(--amb)">Étape 1 :</strong>
-      Prenez <strong id="hypoG">15</strong>g de glucides rapides <em>maintenant</em>.<br>
-      <small style="color:var(--tx3)">3 sucres · 150ml jus d'orange · 4 Dextro-Energy</small>
-    </div>
-    <div class="hstep">
-      <strong style="color:var(--amb)">Étape 2 :</strong>
-      Attendez 15 min sans activité physique.
-    </div>
-    <div class="hstep">
-      <strong style="color:var(--amb)">Étape 3 :</strong>
-      Recontrôlez. Si &lt; 70 mg/dL → répéter.
-    </div>
-    <div id="hypoSev" style="display:none;background:var(--redd);border:1px solid rgba(240,82,82,.3);border-radius:var(--rmd);padding:10px 12px;font-size:.84rem;margin-top:8px;">
-      ⚠️ <strong style="color:var(--red)">Hypo sévère (&lt;54 mg/dL)</strong> : Ne rien donner par la bouche. Injecter glucagon. <strong>Appeler le 15.</strong>
-    </div>
-    <div class="hypo-timer" id="hTimer">15:00</div>
-    <button class="bp" id="hTimerBtn" onclick="startHTimer()" style="background:var(--amb);color:var(--ink)">▶ Démarrer le chrono</button>
-    <button class="bs" onclick="closeM('mHypo');clearHTimer()">Fermer</button>
-  </div>
-</div>
-
-<!-- MODAL BILAN IA -->
+<!-- ════ BILAN IA MODAL ═══════════════════════════════════════════════════ -->
 <div class="modal" id="mBilan">
-  <div class="mc" style="max-width:460px;">
-    <h3 style="color:var(--pur)">🧠 Bilan IA — Analyse des Schémas</h3>
-    <div id="bilanDiv" style="font-size:.87rem;color:var(--tx);line-height:1.65;">
+  <div class="mc">
+    <h3 style="color:var(--pu)">&#x1F9E0; Bilan d'Intelligence Artificielle</h3>
+    <div id="bilanContent" style="font-size:.875rem;color:var(--tx);line-height:1.8;">
       <span class="dots"><span></span><span></span><span></span></span>
+      Analyse de vos sch&#xe9;mas en cours&#x2026;
     </div>
-    <button class="bp" style="background:var(--pur);color:white;margin-top:14px;" onclick="closeM('mBilan')">Fermer</button>
+    <button class="btn-p" style="background:var(--pu);color:#fff;" onclick="closeM('mBilan')">Fermer le rapport</button>
   </div>
 </div>
 
-<!-- MODAL STATS -->
+<!-- ════ STATS MODAL ══════════════════════════════════════════════════════ -->
 <div class="modal" id="mStats">
-  <div class="mc" style="max-width:95vw;">
-    <h3>📊 Suivi Glycémie &amp; Glucides</h3>
-    <div style="position:relative;height:200px;margin-top:10px;">
-      <canvas id="gcChart"></canvas>
+  <div class="mc">
+    <h3>&#x1F4CA; Suivi Glyc&#xe9;mie &amp; Glucides</h3>
+    <div style="position:relative;height:240px;width:100%;">
+      <canvas id="trackerChart"></canvas>
     </div>
-    <div class="stats-grid" id="statsGrid"></div>
-    <button class="bp" style="margin-top:14px;" onclick="closeM('mStats')">Retour</button>
+    <button class="btn-p" style="margin-top:14px;" onclick="closeM('mStats')">Retour</button>
   </div>
 </div>
 
-<!-- MODAL CAMÉRA -->
-<div class="cam-modal" id="mCam">
-  <div class="cam-hdr">
-    <span style="font-family:'DM Mono',monospace;font-size:.78rem;color:var(--mint);text-transform:uppercase;letter-spacing:.06em">Analyse Repas</span>
-    <button onclick="closeCam()" style="background:transparent;border:none;color:var(--tx2);font-size:1.2rem;cursor:pointer;width:34px;height:34px;">✕</button>
+<!-- ════ CAMERA MODAL ════════════════════════════════════════════════════ -->
+<div class="plate-modal" id="plateModal">
+  <div class="plate-hdr">
+    <span class="plate-lbl">Analyse Repas &#xB7; Pixtral</span>
+    <button class="plate-close" onclick="closePlateModal()">&#x2715;</button>
   </div>
-  <div class="cam-vp">
+  <div class="plate-vp">
     <video id="plateVideo" autoplay playsinline muted></video>
     <canvas id="plateCanvas"></canvas>
     <img id="platePreview" alt="Assiette">
-    <div id="camStatus">Activation caméra…</div>
-    <div class="cam-guide" id="camGuide"></div>
   </div>
-  <div class="cam-ctrl">
+  <div class="plate-ctrl">
     <div id="snapPhase">
       <button class="snap-btn" onclick="snapPhoto()">
-        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.2"/><path d="M9 2L7.17 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2h-3.17L15 2H9zm3 15c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5z"/></svg>
+        <svg viewBox="0 0 24 24">
+          <circle cx="12" cy="12" r="3.2"></circle>
+          <path d="M9 2L7.17 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2h-3.17L15 2H9zm3 15c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5z"/>
+        </svg>
       </button>
-      <div style="font-size:.7rem;color:var(--tx3);margin-top:9px;font-family:'DM Mono',monospace">Photographiez votre assiette</div>
     </div>
-    <div id="previewPhase" style="display:none">
-      <div class="cam-actions">
-        <button class="cam-retake" onclick="retakePhoto()">↺ Reprendre</button>
-        <button class="cam-analyze" onclick="analyzePlate()">Analyser les glucides</button>
+    <div id="previewPhase" style="display:none;">
+      <div class="plate-actions">
+        <button class="plate-retake" onclick="retakePhoto()">Reprendre</button>
+        <button class="plate-analyze" onclick="analyzePlate()">Analyser les glucides</button>
       </div>
     </div>
-    <div id="analyzingPhase" style="display:none;color:var(--tx2);font-size:.82rem;">
-      <span class="dots"><span></span><span></span><span></span></span>
-      <span style="margin-left:8px">Pixtral analyse…</span>
+    <div id="analyzingPhase" style="display:none;">
+      <span class="plate-analyzing">
+        <span class="dots"><span></span><span></span><span></span></span>
+        &nbsp;Analyse Pixtral en cours&#x2026;
+      </span>
     </div>
   </div>
 </div>
 
-<!-- APP -->
+<!-- ════ MAIN APP ════════════════════════════════════════════════════════ -->
 <div id="app">
 
-  <!-- HEADER -->
   <div class="hdr">
-    <div class="brand">
-      <h1>Open<span>Vita</span></h1>
-      <span class="brand-tag">DT1 Pro</span>
+    <div class="hdr-left">
+      <div class="logo-pill">
+        <svg viewBox="0 0 24 24">
+          <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+        </svg>
+      </div>
+      <div class="brand">
+        <div class="brand-name">Open<em>Vita</em></div>
+        <div class="brand-sub">DT1 &#xB7; assistant glyc&#xe9;mique</div>
+      </div>
+      <div id="bgChip">&#x1FA78; &#x2014; mg/dL</div>
+      <div id="patientBadge"></div>
+      <div id="iobBadge">&#x1F489; IOB 0.0 U</div>
     </div>
-    <div class="hdr-btns">
-      <button class="pill-hypo" onclick="openHypo()" title="Protocole hypoglycémie">
-        <span class="dot-pulse" style="background:var(--amb)"></span>HYPO
-      </button>
-      <button class="hb" onclick="runAIBilan()" title="Bilan IA" style="font-size:1rem;">🧠</button>
-      <button class="hb" onclick="openStats()" title="Statistiques" style="font-size:1rem;">📊</button>
-      <button class="hb" onclick="loadSettings();openM('mApi')" title="Paramètres" style="font-size:1rem;">⚙️</button>
+    <div class="hdr-right">
+      <button class="hypo-pill" onclick="trigHypo()">HYPO</button>
+      <button class="hbtn ai" onclick="runAIBilan()" title="Bilan IA">&#x1F9E0;</button>
+      <button class="hbtn" id="ttsBtn" onclick="toggleTTS()" title="Lecture vocale">&#x1F507;</button>
+      <button class="hbtn" onclick="openStats()" title="Statistiques">&#x1F4CA;</button>
+      <button class="hbtn" onclick="loadSettings(); openM('mApi')" title="Param&#xe8;tres">&#x2699;&#xFE0F;</button>
     </div>
   </div>
 
-  <!-- CHAT -->
   <div id="cwin"></div>
 
-  <!-- INPUT BAR -->
-  <div class="inpa">
-    <input type="file" id="fGallery" accept="image/*" onchange="handleFile(event)" style="display:none">
-    <input type="file" id="fCamera"  accept="image/*" capture="environment" onchange="handleFileCam(event)" style="display:none">
-    <button class="ib bg-btn" onclick="openBGModal()" title="Saisir glycémie">🩸</button>
-    <button class="ib cam-btn" onclick="openCam()" title="Analyser assiette">
-      <svg viewBox="0 0 24 24"><path d="M9 2L7.17 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2h-3.17L15 2H9zm3 15c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5z"/></svg>
-    </button>
-    <button class="ib" onclick="document.getElementById('fGallery').click()" title="Galerie">
-      <svg viewBox="0 0 24 24"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3L14.5 12l4.5 6H5l3.5-4.5z"/></svg>
-    </button>
-    <button class="ib" id="micBtn" onclick="toggleVoice()" title="Voix">
-      <svg viewBox="0 0 24 24"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.3-3c0 3-2.54 5.1-5.3 5.1S6.7 14 6.7 11H5c0 3.41 2.72 6.23 6 6.72V21h2v-3.28c3.28-.48 6-3.3 6-6.72h-1.7z"/></svg>
-    </button>
-    <input type="text" id="uIn" placeholder="Message…" autocomplete="off" autocorrect="off" spellcheck="false"
-           onkeydown="if(event.key==='Enter')send()">
-    <button class="snd" onclick="send()">
-      <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
-    </button>
+  <div class="inpa-wrap">
+    <div id="interimText"></div>
+    <div class="inpa">
+      <input type="file" id="fInput" accept="image/*" style="display:none;">
+      <button class="ibtn bg" onclick="promptBG()" title="Saisir ma glyc&#xe9;mie">&#x1FA78;</button>
+      <button class="ibtn cam" onclick="openPlateModal()" title="Photo assiette">
+        <svg viewBox="0 0 24 24">
+          <path d="M9 2L7.17 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2h-3.17L15 2H9zm3 15c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5z"/>
+        </svg>
+      </button>
+      <button class="ibtn" onclick="document.getElementById('fInput').click()" title="Importer photo">&#x1F4C1;</button>
+      <input type="text" id="uIn" placeholder="Message ou demande&#x2026;" autocomplete="off"
+             onkeydown="if(event.key==='Enter')send()">
+      <button class="ibtn mic" id="micBtn" onclick="toggleVoice()" title="Commande vocale">&#x1F3A4;</button>
+      <button class="send-btn" onclick="send()">
+        <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+      </button>
+    </div>
   </div>
-</div>
+
+</div><!-- #app -->
 
 <script>
-// ══════════════════════════════════════════
-// CONSTANTES & STATE
-// ══════════════════════════════════════════
-const API = 'https://api.mistral.ai/v1/chat/completions';
-const MDL_TEXT = 'mistral-small-2506';
-const MDL_VIS  = 'pixtral-large-latest';
+'use strict';
 
-// localStorage safe wrapper
-function sl(a,k,v){
-  try{
-    if(a==='g') return localStorage.getItem(k);
-    if(a==='s') { localStorage.setItem(k,v); return true; }
-    if(a==='c') { localStorage.clear(); return true; }
-  }catch(e){ return null; }
+/* ════════════════════════════════════════════════════════════════════════
+   PWA — Service Worker (HTTPS only)
+════════════════════════════════════════════════════════════════════════ */
+(function registerSW() {
+  if (!('serviceWorker' in navigator) || location.protocol !== 'https:') return;
+  var swCode = [
+    'self.addEventListener("install",function(e){',
+    '  e.waitUntil(caches.open("ov-v5").then(function(c){return c.addAll(["./"]);}));',
+    '});',
+    'self.addEventListener("fetch",function(e){',
+    '  e.respondWith(caches.match(e.request).then(function(r){return r||fetch(e.request);}));',
+    '});'
+  ].join('');
+  navigator.serviceWorker.register(
+    URL.createObjectURL(new Blob([swCode], { type: 'application/javascript' }))
+  ).catch(function() {});
+}());
+
+/* ════════════════════════════════════════════════════════════════════════
+   UTILS
+════════════════════════════════════════════════════════════════════════ */
+/** LocalStorage helper */
+function sl(action, key, value) {
+  try {
+    if (action === 'g') return localStorage.getItem(key);
+    if (action === 's') localStorage.setItem(key, value);
+  } catch (e) { /* ignore QuotaExceeded / SecurityError */ }
+  return null;
 }
 
-function openM(id){ const e=document.getElementById(id); e.style.display='flex'; e.classList.add('on'); }
-function closeM(id){ const e=document.getElementById(id); e.style.display='none'; e.classList.remove('on'); }
-function sleep(ms){ return new Promise(r=>setTimeout(r,ms)); }
+/** getElementById shorthand */
+function $(id) { return document.getElementById(id); }
 
-let key  = (sl('g','ov_k')||'').replace(/[^\x20-\x7E]/g,'').trim();
-let dt1  = {
-  icr: parseFloat(sl('g','ov_icr'))||10,
-  isf: parseFloat(sl('g','ov_isf'))||40,
-  tgt: parseFloat(sl('g','ov_tgt'))||100,
-  dia: parseFloat(sl('g','ov_dia'))||4
+/** Current time HH:MM */
+function ts() {
+  return new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+}
+
+/** Open / close modal */
+function openM(id) {
+  var el = $(id);
+  if (el) { el.style.display = 'flex'; el.classList.add('on'); }
+}
+function closeM(id) {
+  var el = $(id);
+  if (el) { el.style.display = 'none'; el.classList.remove('on'); }
+}
+
+/** Minimal markdown → HTML (bold + newlines only) */
+function md(text) {
+  return String(text)
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\n/g, '<br>');
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   STATE
+════════════════════════════════════════════════════════════════════════ */
+var apiKey     = sl('g', 'ov_k')   || '';
+var ttsEnabled = sl('g', 'ov_tts') === '1';
+var patient = {
+  prenom: sl('g', 'ov_prenom') || '',
+  age:    parseFloat(sl('g', 'ov_age'))   || 0,
+  poids:  parseFloat(sl('g', 'ov_poids')) || 0
 };
-let hist = [];
-try{ const s=sl('g','ov_h'); hist = s ? JSON.parse(s) : []; }catch(e){ hist=[]; }
-let img64 = null;
+function isChild()     { return patient.age > 0 && patient.age < 18; }
+function estimateTDD() { if (!patient.poids) return null; return Math.round(patient.poids * (isChild() ? 0.4 : 0.5) * 10) / 10; }
+function maxBolus()    { var t = estimateTDD(); return t ? Math.round(t * 0.20 * 10) / 10 : null; }
+function hypoCarbDose(){ if (isChild() && patient.poids > 0) return Math.max(3, Math.min(15, Math.round(patient.poids * 0.3))); return 15; }
+function bgTargetRange(){ return isChild() ? [80, 150] : [70, 180]; }
+var dt1 = {
+  icr:    parseFloat(sl('g', 'ov_icr'))  || 10,
+  isf:    parseFloat(sl('g', 'ov_isf'))  || 40,
+  target: parseFloat(sl('g', 'ov_tgt'))  || 100,
+  dia:    parseFloat(sl('g', 'ov_dia'))  || 4
+};
+var hist = [];
+try {
+  var raw = sl('g', 'ov_h');
+  hist = raw ? JSON.parse(raw) : [];
+} catch (e) { hist = []; }
 
-// ══════════════════════════════════════════
-// INIT
-// ══════════════════════════════════════════
-window.addEventListener('load',()=>{
-  if(!key) openM('mApi');
-  renderHist();
-  if(hist.length===0)
-    addMsg(`Bonjour. OpenVita DT1 Pro initialisé.\nICR=${dt1.icr}g/U · ISF=${dt1.isf}mg/dL/U · Cible=${dt1.tgt}mg/dL`,'ai');
-  // Précharger voix TTS
-  if(window.speechSynthesis)
-    window.speechSynthesis.onvoiceschanged = ()=>window.speechSynthesis.getVoices();
+/* ════════════════════════════════════════════════════════════════════════
+   IOB — Insuline On Board
+════════════════════════════════════════════════════════════════════════ */
+function getIOB() {
+  var now    = Date.now();
+  var diaMs  = (dt1.dia || 4) * 3600000;
+  var total  = 0;
+  hist.forEach(function(h) {
+    if (h.bolus && h.date) {
+      var elapsed = now - h.date;
+      if (elapsed < diaMs) {
+        total += h.bolus * (1 - elapsed / diaMs);
+      }
+    }
+  });
+  return Math.max(0, total);
+}
+
+function updateIOBUI() {
+  var iob  = getIOB();
+  var badge = $('iobBadge');
+  if (!badge) return;
+  if (iob > 0.1) {
+    badge.textContent = '\u1F489 IOB ' + iob.toFixed(1) + ' U';
+    badge.style.display = 'inline-flex';
+  } else {
+    badge.style.display = 'none';
+  }
+}
+
+function updateBGChip(bg) {
+  var chip  = $('bgChip');
+  if (!chip) return;
+  var range = bgTargetRange();
+  var color = bg > range[1] ? 'var(--am)' : bg < range[0] ? 'var(--rd)' : 'var(--m)';
+  chip.textContent = '\uD83E\uDE78 ' + bg + ' mg/dL';
+  chip.style.color = color;
+  chip.style.borderColor = color;
+  chip.style.display = 'inline-flex';
+}
+function updatePatientBadge() {
+  var b = $('patientBadge');
+  if (!b) return;
+  if (!patient.prenom && !patient.age) { b.style.display = 'none'; return; }
+  var label = patient.prenom || '';
+  if (patient.age) label += (label ? ', ' : '') + patient.age + '\u00a0ans';
+  if (isChild())   label += '\u00a0\uD83D\uDC76';
+  b.textContent = label;
+  b.style.display = 'inline-flex';
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   TTS — Text-to-Speech
+════════════════════════════════════════════════════════════════════════ */
+function stripHTML(html) {
+  return String(html)
+    .replace(/<[^>]+>/g, ' ')
+    .replace(/\*\*/g, '')
+    .replace(/\*/g, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function getFRVoice() {
+  if (!window.speechSynthesis) return null;
+  var voices = window.speechSynthesis.getVoices();
+  return (
+    voices.find(function(v) { return v.lang.startsWith('fr') && !v.name.includes('Google'); }) ||
+    voices.find(function(v) { return v.lang.startsWith('fr'); }) ||
+    null
+  );
+}
+
+function speak(text) {
+  if (!ttsEnabled || !window.speechSynthesis) return;
+  window.speechSynthesis.cancel();
+  var utt    = new SpeechSynthesisUtterance(stripHTML(text));
+  utt.lang   = 'fr-FR';
+  utt.rate   = 1.05;
+  utt.pitch  = 1;
+  utt.volume = 1;
+  var voice  = getFRVoice();
+  if (voice) utt.voice = voice;
+  window.speechSynthesis.speak(utt);
+}
+
+function speakOne(btnEl, text) {
+  if (!window.speechSynthesis) return;
+  if (window.speechSynthesis.speaking) { window.speechSynthesis.cancel(); return; }
+  btnEl.classList.add('speaking');
+  var utt   = new SpeechSynthesisUtterance(stripHTML(text));
+  utt.lang  = 'fr-FR';
+  utt.rate  = 1.05;
+  var voice = getFRVoice();
+  if (voice) utt.voice = voice;
+  utt.onend  = function() { btnEl.classList.remove('speaking'); };
+  utt.onerror = function() { btnEl.classList.remove('speaking'); };
+  window.speechSynthesis.speak(utt);
+}
+
+function toggleTTS() {
+  ttsEnabled = !ttsEnabled;
+  sl('s', 'ov_tts', ttsEnabled ? '1' : '0');
+  updateTTSUI();
+}
+
+function updateTTSUI() {
+  var tog = $('togTTS');
+  var btn = $('ttsBtn');
+  if (tog) {
+    if (ttsEnabled) tog.classList.add('on');
+    else            tog.classList.remove('on');
+  }
+  if (btn) {
+    btn.textContent = ttsEnabled ? '\uD83D\uDD0A' : '\uD83D\uDD07';
+    if (ttsEnabled) btn.classList.add('tts-on');
+    else            btn.classList.remove('tts-on');
+  }
+}
+
+// Reload voices list (required on some browsers/Android)
+if (window.speechSynthesis) {
+  window.speechSynthesis.onvoiceschanged = function() {};
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   STR — Speech Recognition (fresh instance per call — iOS Safari safe)
+════════════════════════════════════════════════════════════════════════ */
+var voiceActive   = false;
+var recognition   = null;
+
+function toggleVoice() {
+  if (voiceActive) { stopVoice(); } else { startVoice(); }
+}
+
+function startVoice() {
+  var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SR) {
+    addMsg('Reconnaissance vocale non support\u00e9e sur ce navigateur.', 'ai', false);
+    return;
+  }
+  voiceActive = true;
+  $('micBtn').classList.add('rec');
+
+  var interim = $('interimText');
+  interim.style.display = 'block';
+  interim.textContent   = '\uD83C\uDF99\uFE0F Je vous \u00e9coute\u2026';
+
+  recognition = new SR();             // Fresh instance required for iOS Safari
+  recognition.lang             = 'fr-FR';
+  recognition.continuous       = false;
+  recognition.interimResults   = true;
+  recognition.maxAlternatives  = 1;
+
+  recognition.onresult = function(e) {
+    var finalText   = '';
+    var interimText = '';
+    for (var i = e.resultIndex; i < e.results.length; i++) {
+      if (e.results[i].isFinal) { finalText   += e.results[i][0].transcript; }
+      else                      { interimText += e.results[i][0].transcript; }
+    }
+    if (finalText) {
+      $('uIn').value          = finalText.trim();
+      interim.textContent     = '\u2705 ' + finalText.trim();
+      stopVoice();
+      setTimeout(send, 300);
+    } else {
+      interim.textContent = '\uD83C\uDF99\uFE0F ' + interimText;
+    }
+  };
+
+  recognition.onerror = function(e) {
+    stopVoice();
+    if (e.error !== 'no-speech' && e.error !== 'aborted') {
+      addMsg('\u26A0\uFE0F Erreur vocale\u00a0: ' + e.error, 'ai', false);
+    }
+  };
+  recognition.onend = function() { stopVoice(); };
+  recognition.start();
+}
+
+function stopVoice() {
+  voiceActive = false;
+  var btn = $('micBtn');
+  if (btn) btn.classList.remove('rec');
+  if (recognition) {
+    try { recognition.stop(); } catch (e) { /* ignore */ }
+    recognition = null;
+  }
+  setTimeout(function() {
+    var i = $('interimText');
+    if (i) i.style.display = 'none';
+  }, 1400);
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   MISTRAL NETWORK LAYER
+   — Unified, typed errors, timeout, 429-retry with back-off,
+     non-API field sanitization, offline detection
+════════════════════════════════════════════════════════════════════════ */
+
+/** Strip non-API fields from history messages before sending */
+function sanitizeMsgs(messages) {
+  return messages.map(function(m) {
+    if (typeof m.content !== 'string') return m;
+    return { role: m.role, content: m.content };
+  });
+}
+
+/** Human-readable error for HTTP status codes */
+function httpErrLabel(status) {
+  if (status === 401) return '\uD83D\uDD11 Cl\u00e9 API invalide \u2014 v\u00e9rifiez vos param\u00e8tres (\u2699\uFE0F).';
+  if (status === 403) return '\uD83D\uDD11 Acc\u00e8s refus\u00e9 (403) \u2014 droits insuffisants.';
+  if (status === 429) return '\u23F3 Quota Mistral atteint (429) \u2014 r\u00e9essayez dans quelques secondes.';
+  if (status >= 500)  return '\uD83D\uDD27 Serveur Mistral indisponible (' + status + ') \u2014 r\u00e9essayez plus tard.';
+  return '\u274C Erreur inattendue (' + status + ').';
+}
+
+/** Human-readable error for caught exceptions */
+function aiErrMsg(e) {
+  if (!navigator.onLine)                                  return '\uD83D\uDCF5 Pas de connexion r\u00e9seau.';
+  if (e && (e.type === 'timeout' || e.name === 'AbortError')) return '\u23F1\uFE0F D\u00e9lai d\u00e9pass\u00e9 (30s) \u2014 v\u00e9rifiez votre connexion.';
+  if (e && e.status)                                      return httpErrLabel(e.status);
+  if (e && e.message === 'empty_response')                return '\u26A0\uFE0F La r\u00e9ponse de l\'IA \u00e9tait vide.';
+  return '\u274C Erreur r\u00e9seau inattendue.';
+}
+
+/**
+ * mistralCall — central fetch wrapper
+ * @param {Object} payload  — Mistral API request body
+ * @param {Object} opts     — { timeout: ms, retries: n }
+ * @returns {Promise<string>} — model response text
+ */
+function mistralCall(payload, opts) {
+  var timeout = (opts && opts.timeout) || 30000;
+  var retries = (opts && opts.retries) !== undefined ? opts.retries : 2;
+
+  if (!navigator.onLine) {
+    return Promise.reject({ type: 'offline' });
+  }
+
+  function attempt(n) {
+    var ctrl = new AbortController();
+    var tid  = setTimeout(function() { ctrl.abort(); }, timeout);
+
+    return fetch('https://api.mistral.ai/v1/chat/completions', {
+      method: 'POST',
+      signal: ctrl.signal,
+      headers: {
+        'Content-Type':  'application/json',
+        'Authorization': 'Bearer ' + apiKey
+      },
+      body: JSON.stringify(payload)
+    })
+    .then(function(r) {
+      clearTimeout(tid);
+      if (r.status === 429 && n < retries) {
+        // Back-off: 2.5s, 5s
+        return new Promise(function(res) { setTimeout(res, (n + 1) * 2500); })
+          .then(function() { return attempt(n + 1); });
+      }
+      if (!r.ok) { return Promise.reject({ status: r.status }); }
+      return r.json();
+    })
+    .then(function(data) {
+      var content = data && data.choices && data.choices[0] &&
+                    data.choices[0].message && data.choices[0].message.content;
+      if (!content) { return Promise.reject({ message: 'empty_response' }); }
+      return content;
+    })
+    .catch(function(e) {
+      clearTimeout(tid);
+      if (e && e.name === 'AbortError') { return Promise.reject({ type: 'timeout' }); }
+      return Promise.reject(e);
+    });
+  }
+
+  return attempt(0);
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   INIT
+════════════════════════════════════════════════════════════════════════ */
+window.addEventListener('load', function() {
+  updateTTSUI();
+  updateIOBUI();
+  updatePatientBadge();
+  if (!apiKey) {
+    openM('mApi');
+  } else {
+    renderHist();
+    if (hist.length === 0) {
+      var gn = patient.prenom ? 'Bonjour <strong>' + patient.prenom + '</strong>\u00a0\uD83D\uDC4B' : 'Bonjour\u00a0\uD83D\uDC4B Je suis <strong>OpenVita</strong>';
+      var gs = isChild() ? 'Glyc\u00e9mie, repas ou question \u2014 je suis l\u00e0.' : 'Dites-moi votre glyc\u00e9mie, photographiez votre repas, ou posez-moi une question.';
+      addMsg(gn + '<br>' + gs, 'ai', true);
+    }
+  }
 });
 
-// ══════════════════════════════════════════
-// PARAMÈTRES
-// ══════════════════════════════════════════
-function loadSettings(){
-  document.getElementById('apiIn').value  = key;
-  document.getElementById('icrIn').value  = dt1.icr;
-  document.getElementById('isfIn').value  = dt1.isf;
-  document.getElementById('tgtIn').value  = dt1.tgt;
-  document.getElementById('diaIn').value  = dt1.dia;
+/* ════════════════════════════════════════════════════════════════════════
+   SETTINGS
+════════════════════════════════════════════════════════════════════════ */
+function loadSettings() {
+  $('apiIn').value      = apiKey;
+  $('prenomIn').value   = patient.prenom;
+  $('ageIn').value      = patient.age   || '';
+  $('poidsIn').value    = patient.poids || '';
+  $('icrIn').value      = dt1.icr;
+  $('isfIn').value      = dt1.isf;
+  $('targetBgIn').value = dt1.target;
+  $('diaIn').value      = dt1.dia;
+  updateTTSUI();
+  refreshCalcSuggest();
 }
 
-async function saveSettings(){
-  key      = (document.getElementById('apiIn').value||'').replace(/[^\x20-\x7E]/g,'').trim();
-  dt1.icr  = parseFloat(document.getElementById('icrIn').value)||10;
-  dt1.isf  = parseFloat(document.getElementById('isfIn').value)||40;
-  dt1.tgt  = parseFloat(document.getElementById('tgtIn').value)||100;
-  dt1.dia  = parseFloat(document.getElementById('diaIn').value)||4;
-  sl('s','ov_k',key); sl('s','ov_icr',dt1.icr);
-  sl('s','ov_isf',dt1.isf); sl('s','ov_tgt',dt1.tgt); sl('s','ov_dia',dt1.dia);
+function refreshCalcSuggest() {
+  var age   = parseFloat($('ageIn').value)   || 0;
+  var poids = parseFloat($('poidsIn').value) || 0;
+  var card  = $('suggestCard');
+  if (!card) return;
+  if (poids <= 0) { card.style.display = 'none'; return; }
+  var child = age > 0 && age < 18;
+  var tdd   = Math.round(poids * (child ? 0.4 : 0.5) * 10) / 10;
+  $('sug_tdd').textContent = tdd + ' U/j';
+  $('sug_icr').textContent = Math.round(500  / tdd) + ' g/U';
+  $('sug_isf').textContent = Math.round(1800 / tdd) + ' mg/dL/U';
+  $('sug_max').textContent = Math.round(tdd * 0.20 * 10) / 10 + ' U';
+  card.style.display = 'block';
+}
 
-  const res = document.getElementById('apiRes');
-  res.style.display='block';
-  res.style.cssText='display:block;padding:8px 10px;border-radius:8px;font-size:.8rem;color:var(--tx2);background:rgba(255,255,255,.04)';
-  res.textContent = '⏳ Test connexion…';
-  try{
-    const r = await fetch('https://api.mistral.ai/v1/models',{
-      headers:{'Authorization':'Bearer '+key},
-      signal:AbortSignal.timeout(8000)
+function applyCalcSuggest() {
+  var age   = parseFloat($('ageIn').value)   || 0;
+  var poids = parseFloat($('poidsIn').value) || 0;
+  if (!poids) return;
+  var child = age > 0 && age < 18;
+  var tdd   = poids * (child ? 0.4 : 0.5);
+  $('icrIn').value     = Math.round(500  / tdd);
+  $('isfIn').value     = Math.round(1800 / tdd);
+  if (child) $('targetBgIn').value = 120;
+}
+
+function saveSettings() {
+  var newKey = $('apiIn').value.trim();
+  dt1.icr    = parseFloat($('icrIn').value)     || 10;
+  dt1.isf    = parseFloat($('isfIn').value)     || 40;
+  dt1.target = parseFloat($('targetBgIn').value) || 100;
+  dt1.dia    = parseFloat($('diaIn').value)     || 4;
+
+  patient.prenom = ($('prenomIn') ? $('prenomIn').value : '').trim().slice(0, 30);
+  patient.age    = parseFloat($('ageIn').value)   || 0;
+  patient.poids  = parseFloat($('poidsIn').value) || 0;
+  sl('s', 'ov_prenom', patient.prenom);
+  sl('s', 'ov_age',    patient.age);
+  sl('s', 'ov_poids',  patient.poids);
+  sl('s', 'ov_icr', dt1.icr);
+  sl('s', 'ov_isf', dt1.isf);
+  sl('s', 'ov_tgt', dt1.target);
+  sl('s', 'ov_dia', dt1.dia);
+
+  var res = $('apiTestResult');
+  if (!res) return;
+
+  if (!newKey) {
+    res.style.display = 'block';
+    res.style.color   = 'var(--am)';
+    res.textContent   = '\u26A0\uFE0F Cl\u00e9 API manquante.';
+    return;
+  }
+
+  res.style.display = 'block';
+  res.style.color   = 'var(--tx2)';
+  res.textContent   = '\u23F3 Test de la cl\u00e9 en cours\u2026';
+
+  var testPayload = {
+    model: 'mistral-small-2506',
+    messages: [{ role: 'user', content: 'ping' }],
+    max_tokens: 3
+  };
+
+  // Temporarily use the new key for the test
+  var prevKey = apiKey;
+  apiKey = newKey;
+
+  mistralCall(testPayload, { timeout: 9000, retries: 0 })
+    .then(function() {
+      sl('s', 'ov_k', newKey);
+      res.style.color = 'var(--m)';
+      res.textContent = '\u2705 Cl\u00e9 valide \u2014 profil sauvegard\u00e9\u00a0!';
+      updateIOBUI();
+      setTimeout(function() {
+        closeM('mApi');
+        updatePatientBadge();
+        renderHist();
+        if (hist.length === 0) {
+          var g2 = patient.prenom ? 'Bonjour <strong>' + patient.prenom + '</strong>\u00a0\uD83D\uDC4B Profil enregistr\u00e9.' : 'Bonjour\u00a0\uD83D\uDC4B Profil enregistr\u00e9.';
+          addMsg(g2 + '<br>Glyc\u00e9mie, repas ou question \u2014 je suis l\u00e0.', 'ai', true);
+        }
+      }, 1200);
+    })
+    .catch(function(e) {
+      apiKey = prevKey; // Restore on failure
+      if (e && e.status === 401) {
+        res.style.color = 'var(--rd)';
+        res.textContent = '\u274C Cl\u00e9 API invalide (401).';
+      } else if (e && e.status === 429) {
+        // 429 means the key works, quota just hit
+        sl('s', 'ov_k', newKey);
+        res.style.color = 'var(--am)';
+        res.textContent = '\u26A0\uFE0F Cl\u00e9 valide, quota atteint (429).';
+        setTimeout(function() { closeM('mApi'); }, 1600);
+      } else if (e && e.type === 'timeout') {
+        res.style.color = 'var(--am)';
+        res.textContent = '\u26A0\uFE0F Timeout \u2014 v\u00e9rifiez votre connexion.';
+      } else {
+        res.style.color = 'var(--rd)';
+        res.textContent = '\u274C Impossible de joindre Mistral.';
+      }
     });
-    if(r.ok){
-      res.style.color='var(--mint)';
-      res.textContent='✅ Clé valide — Mistral OK';
-      setTimeout(()=>closeM('mApi'),1200);
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   LOG BOLUS
+════════════════════════════════════════════════════════════════════════ */
+window.logBolus = function(units, element) {
+  var u = parseFloat(units);
+  if (isNaN(u) || u <= 0) return;
+  hist.push({ role: 'user', content: '\uD83D\uDC89 Injection confirm\u00e9e\u00a0: ' + u.toFixed(1) + ' U', bolus: u, date: Date.now() });
+  sl('s', 'ov_h', JSON.stringify(hist));
+  addMsg('\uD83D\uDC89 Injection de ' + u.toFixed(1) + ' U not\u00e9e. IOB mis \u00e0 jour.', 'ai', true);
+  updateIOBUI();
+  if (element) {
+    element.disabled     = true;
+    element.textContent  = '\u2705 Inject\u00e9';
+    element.style.opacity = '.5';
+  }
+};
+
+/* ════════════════════════════════════════════════════════════════════════
+   GLYCÉMIE
+════════════════════════════════════════════════════════════════════════ */
+function promptBG() {
+  var val = window.prompt('Saisissez votre glyc\u00e9mie actuelle (mg/dL)\u00a0:');
+  if (val === null || val.trim() === '' || isNaN(val)) return;
+  var bg = parseInt(val, 10);
+  if (bg < 20 || bg > 600) {
+    addMsg('\u26A0\uFE0F Valeur hors plage (20\u2013600 mg/dL).', 'ai', false);
+    return;
+  }
+  hist.push({ role: 'user', content: 'Ma glyc\u00e9mie est de ' + bg + ' mg/dL', bg: bg, date: Date.now() });
+  sl('s', 'ov_h', JSON.stringify(hist));
+  addMsg('\uD83E\uDE78 Ma glyc\u00e9mie est de <strong>' + bg + ' mg/dL</strong>', 'usr', false);
+  updateBGChip(bg);
+
+  var range = bgTargetRange();
+  var capU  = maxBolus();
+  if (bg < range[0]) {
+    trigHypo();
+  } else if (bg > dt1.target + 20) {
+    var iob        = getIOB();
+    var base       = (bg - dt1.target) / dt1.isf;
+    var correction = Math.max(0, base - iob);
+    var safeCorr   = capU ? Math.min(correction, capU) : correction;
+    var msg        = '\uD83D\uDCA1 <strong>Calcul de correction\u00a0:</strong><br>'
+                   + '&mdash; Besoin brut\u00a0: ' + base.toFixed(1) + ' U<br>'
+                   + '&mdash; IOB actif\u00a0: &minus;' + iob.toFixed(1) + ' U<br>';
+    if (correction > 0) {
+      msg += '\uD83D\uDC49 <strong>Dose sugg\u00e9r\u00e9e\u00a0: ' + safeCorr.toFixed(1) + ' U</strong>';
+      if (capU && correction > capU) {
+        msg += '<div class="bolus-warn">\u26A0\uFE0F Dose limit\u00e9e au cap s\u00e9curit\u00e9 (' + capU + ' U = 20% TDD). Consultez votre m\u00e9decin.</div>';
+      }
+      msg += '<br><button class="iob-btn" onclick="logBolus(' + safeCorr.toFixed(1) + ',this)">'
+           + '\uD83D\uDC89 Injecter ' + safeCorr.toFixed(1) + ' U</button>';
     } else {
-      res.style.color='var(--red)';
-      res.innerHTML='❌ Erreur '+r.status+' — <a href="https://console.mistral.ai/api-keys" target="_blank" style="color:var(--mint)">Vérifier la clé →</a>';
+      msg += "\u2705 <strong>Aucune correction n\u00e9cessaire</strong> \u2014 l'insuline active va faire baisser la glyc\u00e9mie.";
     }
-  }catch(e){
-    res.style.color='var(--amb)';
-    res.textContent='⚠️ Réseau : '+e.message;
+    addMsg(msg, 'ai', true);
+  } else {
+    addMsg('\u2705 Glyc\u00e9mie dans la cible.', 'ai', true);
   }
 }
 
-function exportData(){
-  const data = {
-    hist: sl('g','ov_h'),
-    icr:dt1.icr, isf:dt1.isf, tgt:dt1.tgt, dia:dt1.dia,
-    exported: new Date().toISOString()
-  };
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(new Blob([JSON.stringify(data,null,2)],{type:'application/json'}));
-  a.download = 'openvita_dt1_'+Date.now()+'.json';
-  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+function trigHypo() {
+  var dose   = hypoCarbDose();
+  var child  = isChild();
+  var name   = patient.prenom || (child ? 'le patient' : 'vous');
+  var unitKg = (child && patient.poids > 0) ? ' (' + dose + 'g pour ' + patient.poids + ' kg)' : '';
+  var range  = bgTargetRange();
+  var title  = '\uD83D\uDEA8 <strong>ALERTE HYPOGLYC\u00c9MIE</strong>' + (patient.prenom ? ' \u2014 ' + patient.prenom : '');
+  addMsg(title, 'usr', false);
+  var hmsg = '\u26A0\uFE0F <strong>Donnez ' + dose + 'g de sucre rapide' + unitKg + '</strong><br>'
+           + (child ? '\uD83D\uDC76 Restez pr\u00e8s de ' + name + '.<br>' : '')
+           + '\u23F3 Minuteur de 15 minutes lanc\u00e9.';
+  addMsg(hmsg, 'ai', true);
+  window.setTimeout(function() {
+    addMsg('\u23F0 <strong>Recontr\u00f4lez la glyc\u00e9mie\u00a0!</strong> Si &lt; ' + range[0] + '\u00a0mg/dL, redonnez ' + dose + 'g.', 'ai', true);
+  }, 15 * 60 * 1000);
 }
 
-function importData(e){
-  const file = e.target.files[0]; if(!file) return;
-  const reader = new FileReader();
-  reader.onload = ev => {
-    try{
-      const d = JSON.parse(ev.target.result);
-      if(d.hist) sl('s','ov_h',d.hist);
-      if(d.icr)  sl('s','ov_icr',d.icr);
-      if(d.isf)  sl('s','ov_isf',d.isf);
-      if(d.tgt)  sl('s','ov_tgt',d.tgt);
-      if(d.dia)  sl('s','ov_dia',d.dia);
-      alert('✅ Données importées — rechargement…');
-      location.reload();
-    }catch(err){ alert('❌ Fichier invalide'); }
-  };
-  reader.readAsText(file);
-  e.target.value='';
+/* ════════════════════════════════════════════════════════════════════════
+   CHAT RENDERING
+════════════════════════════════════════════════════════════════════════ */
+function addMsg(text, cls, doSpeak) {
+  if (!text) return;
+  var chat = $('cwin');
+  var d    = document.createElement('div');
+  d.className = 'msg ' + cls;
+
+  var foot = document.createElement('div');
+  foot.className = 'msg-foot';
+
+  var tsEl = document.createElement('span');
+  tsEl.className   = 'msg-ts';
+  tsEl.textContent = ts();
+  foot.appendChild(tsEl);
+
+  if (cls === 'ai') {
+    var spk     = document.createElement('button');
+    spk.className = 'speak-btn';
+    spk.title   = 'Lire \u00e0 voix haute';
+    spk.textContent = '\uD83D\uDD09';
+    var capturedText = text;
+    spk.onclick = function() { speakOne(spk, capturedText); };
+    foot.appendChild(spk);
+  }
+
+  d.innerHTML = md(text);
+  d.appendChild(foot);
+  chat.appendChild(d);
+  requestAnimationFrame(function() { chat.scrollTop = chat.scrollHeight; });
+  if (cls === 'ai' && doSpeak) speak(text);
 }
 
-// ══════════════════════════════════════════
-// SAISIE GLYCÉMIE
-// ══════════════════════════════════════════
-function openBGModal(){
-  document.getElementById('bgIn').value      = '';
-  document.getElementById('bgCarbsIn').value = '';
-  document.getElementById('bgBolusIn').value = '';
-  openM('mBG');
-  setTimeout(()=>document.getElementById('bgIn').focus(), 200);
+function addMsgHTML(html, cls) {
+  var chat = $('cwin');
+  var d    = document.createElement('div');
+  d.className = 'msg ' + cls;
+  d.innerHTML = (html || '') + '<div class="msg-foot"><span class="msg-ts">' + ts() + '</span></div>';
+  chat.appendChild(d);
+  requestAnimationFrame(function() { chat.scrollTop = chat.scrollHeight; });
 }
 
-function setBGQ(v){ document.getElementById('bgIn').value=v; }
-
-function saveBG(){
-  const bg    = parseInt(document.getElementById('bgIn').value);
-  if(isNaN(bg)||bg<20||bg>600){ document.getElementById('bgIn').focus(); return; }
-  const carbs = parseFloat(document.getElementById('bgCarbsIn').value)||0;
-  const bolus = parseFloat(document.getElementById('bgBolusIn').value)||0;
-  closeM('mBG');
-
-  // Enregistrement
-  const entry = {
-    role:'user',
-    content:`Glycémie: ${bg} mg/dL`+(carbs?` · ${carbs}g glucides`:'')+(bolus?` · ${bolus}U`:'')+` [${new Date().toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'})}]`,
-    bg, carbs:carbs||undefined, bolus:bolus||undefined, date:Date.now()
-  };
-  hist.push(entry);
-  sl('s','ov_h',JSON.stringify(hist));
-
-  // Calculs automatiques
-  const cls = bg<70 ? 'c-lo' : bg>180 ? 'c-hi' : 'c-ok';
-  const corr = bg > dt1.tgt ? Math.round((bg-dt1.tgt)/dt1.isf*10)/10 : 0;
-  const bRep = carbs ? Math.round(carbs/dt1.icr*10)/10 : 0;
-  const tot  = Math.round((corr+bRep)*10)/10;
-
-  let rows = '';
-  if(carbs) rows+=`<div class="data-row"><span>Glucides repas</span><span style="color:var(--mint)">${carbs}g</span></div>`;
-  if(bolus) rows+=`<div class="data-row"><span>Bolus injecté</span><span style="color:var(--pur)">${bolus}U</span></div>`;
-  if(corr>0) rows+=`<div class="data-row"><span>Correction</span><span style="color:var(--amb)">${corr}U</span></div>`;
-  if(bRep>0) rows+=`<div class="data-row"><span>Bolus repas</span><span style="color:var(--blue)">${bRep}U</span></div>`;
-  if(tot>0)  rows+=`<div class="data-row" style="font-weight:600"><span>Total bolus</span><span style="color:var(--mint)">${tot}U</span></div>`;
-
-  const html = `<div class="bg-card">
-    <div style="display:flex;align-items:baseline;gap:8px;margin-bottom:10px">
-      <span class="bg-big ${cls}">${bg}</span>
-      <span style="font-size:.8rem;color:var(--tx3)">mg/dL</span>
-      <span style="font-size:.74rem;color:${bg<70?'var(--amb)':bg>180?'var(--red)':'var(--mint)'}">${bg<70?'⚠️ HYPO':bg>180?'↑ HYPER':'✓ Cible'}</span>
-    </div>
-    ${rows}
-  </div>`;
-  addMsgH(html,'ai');
-
-  if(bg < 70) setTimeout(()=>openHypo(bg), 300);
-  // Petit cooldown après saisie pour éviter une requête immédiate
-  apiCooldownUntil = Math.max(apiCooldownUntil, Date.now() + 1500);
-}
-
-// ══════════════════════════════════════════
-// PROTOCOLE HYPO
-// ══════════════════════════════════════════
-let hTimerID = null;
-
-function openHypo(bg){
-  const g = Math.max(15, Math.round(dt1.icr * 1.5));
-  document.getElementById('hypoG').textContent = g;
-  document.getElementById('hypoSev').style.display = (bg && bg < 54) ? 'block' : 'none';
-  clearHTimer();
-  openM('mHypo');
-}
-
-function startHTimer(){
-  let s = 900;
-  const btn = document.getElementById('hTimerBtn');
-  btn.disabled = true;
-  btn.textContent = '⏸ En cours…';
-  hTimerID = setInterval(()=>{
-    s--;
-    const m=Math.floor(s/60), sec=s%60;
-    document.getElementById('hTimer').textContent = m+':'+(sec<10?'0':'')+sec;
-    if(s<=0){
-      clearHTimer();
-      document.getElementById('hTimer').textContent = '✅ Recontrôlez !';
-    }
-  },1000);
-}
-
-function clearHTimer(){
-  if(hTimerID){ clearInterval(hTimerID); hTimerID=null; }
-  document.getElementById('hTimer').textContent = '15:00';
-  const btn = document.getElementById('hTimerBtn');
-  if(btn){ btn.disabled=false; btn.textContent='▶ Démarrer le chrono'; }
-}
-
-// ══════════════════════════════════════════
-// VOIX
-// ══════════════════════════════════════════
-const SR = window.SpeechRecognition || window.webkitSpeechRecognition || null;
-let isRec = false;
-
-function toggleVoice(){
-  if(!SR){ alert('Reconnaissance vocale non supportée sur ce navigateur.'); return; }
-  const btn = document.getElementById('micBtn');
-  if(isRec){ isRec=false; btn.classList.remove('mic-rec'); return; }
-  const r = new SR();
-  r.lang='fr-FR'; r.interimResults=false; r.maxAlternatives=1;
-  r.onstart  = ()=>{ isRec=true; btn.classList.add('mic-rec'); };
-  r.onresult = e=>{ document.getElementById('uIn').value=e.results[0][0].transcript; isRec=false; btn.classList.remove('mic-rec'); send(true); };
-  r.onerror  = e=>{ isRec=false; btn.classList.remove('mic-rec'); if(e.error==='not-allowed') alert('Microphone refusé. Vérifiez les autorisations.'); };
-  r.onend    = ()=>{ isRec=false; btn.classList.remove('mic-rec'); };
-  try{ r.start(); }catch(e){}
-}
-
-function speakAI(t){
-  if(!window.speechSynthesis) return;
-  window.speechSynthesis.cancel();
-  setTimeout(()=>{
-    const u = new SpeechSynthesisUtterance(
-      t.replace(/[*#_`<>]/g,'').replace(/https?:\S+/g,'').substring(0,400)
-    );
-    u.lang='fr-FR'; u.pitch=0.95; u.rate=0.9;
-    const v = window.speechSynthesis.getVoices().find(v=>v.lang.startsWith('fr'));
-    if(v) u.voice=v;
-    window.speechSynthesis.speak(u);
-  },100);
-}
-
-// ══════════════════════════════════════════
-// IMAGE (galerie)
-// ══════════════════════════════════════════
-function handleFile(e){
-  const file = e.target.files[0]; if(!file) return;
-  const reader = new FileReader();
-  reader.onload = ev=>{
-    img64 = ev.target.result;
-    addMsgH('<img src="'+img64+'" class="prev-img" alt="Image">', 'usr');
-    document.getElementById('uIn').placeholder = 'Analyser cet aliment…';
-  };
-  reader.readAsDataURL(file);
-  e.target.value='';
-}
-
-// ══════════════════════════════════════════
-// HISTORIQUE
-// ══════════════════════════════════════════
-function renderHist(){
-  const chat = document.getElementById('cwin');
-  chat.innerHTML = '';
-  hist.forEach(m=>{
-    if(m.role==='system') return;
-    const t = typeof m.content==='string' ? m.content : '[Image]';
-    addMsg(t, m.role==='user' ? 'usr' : 'ai');
+function renderHist() {
+  var cwin = $('cwin');
+  if (!cwin) return;
+  cwin.innerHTML = '';
+  hist.forEach(function(m) {
+    if (m.role === 'system') return;
+    var text = typeof m.content === 'string' ? m.content : '[Image analys\u00e9e]';
+    addMsg(text, m.role === 'user' ? 'usr' : 'ai', false);
   });
+  updateIOBUI();
 }
 
-// ══════════════════════════════════════════
-// API MISTRAL — Retry 429 avec backoff
-// ══════════════════════════════════════════
-async function mistralFetch(body){
-  // ── File d'attente anti-rate-limit ──────────────────────────
-  // Attend si un cooldown est actif (après un 429 ou entre requêtes)
-  if(apiCooldownUntil > Date.now()){
-    const wait = apiCooldownUntil - Date.now();
-    showCooldown(Math.ceil(wait/1000));
-    await sleep(wait);
-    hideCooldown();
+/* ════════════════════════════════════════════════════════════════════════
+   SEND / callAI
+════════════════════════════════════════════════════════════════════════ */
+var _aiInFlight = false;
+
+function send() {
+  var inp = $('uIn');
+  if (!inp) return;
+  var text = inp.value.trim();
+  if (!text) return;
+
+  // Visual guard if a request is already in flight
+  if (_aiInFlight) {
+    inp.style.borderColor = 'var(--am)';
+    setTimeout(function() { inp.style.borderColor = ''; }, 800);
+    return;
   }
 
-  const r = await fetch(API, {
-    method:'POST',
-    headers:{'Content-Type':'application/json','Authorization':'Bearer '+key},
-    body: JSON.stringify(body),
-    signal: AbortSignal.timeout(35000)
-  });
-
-  if(r.ok){
-    // Succès → cooldown de 2s minimum entre requêtes (plan gratuit)
-    apiCooldownUntil = Date.now() + 2000;
-    return r;
-  }
-
-  if(r.status === 429){
-    // Lire Retry-After ou utiliser 65s par défaut (plan gratuit Mistral)
-    const ra   = r.headers.get('Retry-After');
-    const wait = ra ? parseInt(ra)*1000 : 65000;
-    apiCooldownUntil = Date.now() + wait;
-
-    // Afficher le compte à rebours dans le message loading
-    const el = document.getElementById('__ld__');
-    if(el){
-      let left = Math.ceil(wait/1000);
-      el.innerHTML = rateMsg(left);
-      const tick = setInterval(()=>{
-        left--;
-        if(el) el.innerHTML = rateMsg(left);
-        if(left<=0) clearInterval(tick);
-      },1000);
-    }
-    // Bloquer le bouton send pendant l'attente
-    showCooldown(Math.ceil(wait/1000));
-    await sleep(wait);
-    hideCooldown();
-
-    // Réessayer une seule fois
-    const r2 = await fetch(API, {
-      method:'POST',
-      headers:{'Content-Type':'application/json','Authorization':'Bearer '+key},
-      body: JSON.stringify(body),
-      signal: AbortSignal.timeout(35000)
-    });
-    if(r2.ok){ apiCooldownUntil = Date.now() + 2000; return r2; }
-    if(r2.status===401) throw new Error('AUTH_401');
-    throw new Error('RATE_LIMIT');
-  }
-
-  if(r.status===401) throw new Error('AUTH_401');
-  const err = await r.json().catch(()=>({}));
-  throw new Error(err.message || 'HTTP '+r.status);
+  addMsg(text, 'usr', false);
+  inp.value = '';
+  hist.push({ role: 'user', content: text, date: Date.now() });
+  sl('s', 'ov_h', JSON.stringify(hist));
+  callAI();
 }
 
-function rateMsg(s){
-  return '⏳ Quota API — <strong style="color:var(--amb)">réessai dans '+s+'s</strong>'
-    +'<br><small style="color:var(--tx3);font-size:.7rem">Plan gratuit Mistral ≈ 1 req/min'
-    +' · <a href="https://console.mistral.ai" target="_blank" style="color:var(--mint)">Passer payant →</a></small>';
-}
+function callAI() {
+  if (!apiKey) { openM('mApi'); return; }
+  if (_aiInFlight) return;
+  _aiInFlight = true;
 
-// ── Cooldown UI : barre de progression + bouton désactivé ──────
-let cooldownTimer = null;
-function showCooldown(seconds){
-  const btn = document.getElementById('uIn');
-  const snd = document.querySelector('.snd');
-  if(btn){ btn.placeholder = '⏳ Attente '+seconds+'s…'; btn.disabled=true; }
-  if(snd){ snd.style.opacity='.4'; snd.style.pointerEvents='none'; }
+  var chat = $('cwin');
+  if (!chat) { _aiInFlight = false; return; }
 
-  // Barre de progression dans le header
-  let bar = document.getElementById('apiBar');
-  if(!bar){
-    bar = document.createElement('div');
-    bar.id = 'apiBar';
-    bar.style.cssText = 'position:absolute;bottom:0;left:0;height:2px;background:var(--amb);transition:width 1s linear;width:100%;z-index:10';
-    document.querySelector('.hdr').style.position='relative';
-    document.querySelector('.hdr').appendChild(bar);
-  }
-  bar.style.width='100%';
-  let pct=100, step=100/seconds;
-  clearInterval(cooldownTimer);
-  cooldownTimer = setInterval(()=>{
-    pct -= step;
-    if(bar) bar.style.width=Math.max(0,pct)+'%';
-    if(pct<=0){
-      clearInterval(cooldownTimer);
-      hideCooldown();
-    }
-  },1000);
-}
+  // Remove any stale loading bubble
+  var stale = document.getElementById('__ld__');
+  if (stale) stale.parentNode.removeChild(stale);
 
-function hideCooldown(){
-  clearInterval(cooldownTimer);
-  const btn = document.getElementById('uIn');
-  const snd = document.querySelector('.snd');
-  if(btn){ btn.placeholder='Message…'; btn.disabled=false; }
-  if(snd){ snd.style.opacity=''; snd.style.pointerEvents=''; }
-  const bar = document.getElementById('apiBar');
-  if(bar){ bar.style.width='0%'; setTimeout(()=>bar.remove(),300); }
-}
-
-// ══════════════════════════════════════════
-// ENVOI MESSAGE & APPEL IA
-// ══════════════════════════════════════════
-// File d'attente : 1 requête à la fois
-let apiQueue     = Promise.resolve();
-let apiCooldownUntil = 0;
-
-function send(voice=false){
-  const inp = document.getElementById('uIn');
-  const t   = inp.value.trim();
-  if(!t && !img64) return;
-  if(inp.disabled) return; // Bloquer si cooldown actif
-  addMsg(t,'usr');
-  inp.value='';
-  hist.push({role:'user', content:t, date:Date.now()});
-  sl('s','ov_h',JSON.stringify(hist));
-  callAI(voice);
-}
-
-
-async function callAI(voice=false){
-  if(!key){ openM('mApi'); return; }
-  // Chaîner dans la file d'attente pour éviter les requêtes simultanées
-  apiQueue = apiQueue.then(()=>_callAI(voice)).catch(()=>{});
-  return apiQueue;
-}
-
-async function _callAI(voice=false){
-  const chat = document.getElementById('cwin');
-  const ld = document.createElement('div');
-  ld.className='msg ai'; ld.id='__ld__';
+  var ld = document.createElement('div');
+  ld.className = 'msg ai';
+  ld.id        = '__ld__';
   ld.innerHTML = '<span class="dots"><span></span><span></span><span></span></span>';
   chat.appendChild(ld);
-  requestAnimationFrame(()=>chat.scrollTop=chat.scrollHeight);
+  chat.scrollTop = chat.scrollHeight;
 
-  const sys = {
-    role:'system',
-    content:`Tu es un assistant Diabète Type 1. ICR=${dt1.icr}g/U · ISF=${dt1.isf}mg/dL/U · Cible=${dt1.tgt}mg/dL. Sois concis et clinique.`
-  };
-  const trimmed = hist.length>15 ? [hist[0],...hist.slice(-14)] : hist;
-  let msgs = [sys, ...trimmed];
+  var _tdd   = estimateTDD();
+  var _cap   = maxBolus();
+  var _pat   = '';
+  if (patient.prenom) _pat += ' Prenom: ' + patient.prenom + '.';
+  if (patient.age)    _pat += ' Age: ' + patient.age + ' ans.';
+  if (patient.poids)  _pat += ' Poids: ' + patient.poids + ' kg.';
+  var _kid = isChild()
+    ? ' PATIENT ENFANT PEDIATRIQUE. Adapter langage et doses.'
+      + ' Dose hypo: ' + hypoCarbDose() + 'g. Cibles: 80-150 mg/dL.'
+      + (_tdd ? ' TDD: ' + _tdd + ' U/j.' : '')
+      + (_cap ? ' Bolus max: ' + _cap + ' U.' : '')
+    : '';
+  var sysContent = 'Tu es un assistant medical specialise Diabete Type 1.'
+                 + ' Reponds en francais, facon concise et bienveillante.'
+                 + _pat + _kid
+                 + ' Parametres: ICR=' + dt1.icr + ', ISF=' + dt1.isf
+                 + ', Cible=' + dt1.target + ', DIA=' + dt1.dia + 'h.'
+                 + ' IOB: ' + getIOB().toFixed(1) + ' U.';
 
-  // Image si présente
-  if(img64){
-    const last = msgs[msgs.length-1];
-    if(last && last.role==='user' && typeof last.content==='string'){
-      last.content = [
-        {type:'text', text:last.content||'Analyse cet aliment.'},
-        {type:'image_url', image_url:{url:img64}}
-      ];
-      img64=null;
-      document.getElementById('uIn').placeholder='Message…';
-    }
-  }
+  var msgs = sanitizeMsgs(
+    [{ role: 'system', content: sysContent }].concat(hist.slice(-12))
+  );
 
-  try{
-    const r   = await mistralFetch({model:MDL_TEXT, messages:msgs, temperature:0.2, max_tokens:600});
-    const d   = await r.json();
-    const rep = d.choices[0].message.content;
-    document.getElementById('__ld__')?.remove();
-    addMsg(rep,'ai');
-    hist.push({role:'assistant', content:rep, date:Date.now()});
-    sl('s','ov_h',JSON.stringify(hist));
-    if(voice) speakAI(rep);
-  }catch(e){
-    const el = document.getElementById('__ld__'); if(!el) return;
-    if(e.message==='RATE_LIMIT'){
-      el.innerHTML = '<div style="color:var(--amb);font-weight:600">⏱️ Quota Mistral dépassé</div>'
-        + '<div style="font-size:.8rem;color:var(--tx2);margin-top:5px">Attendez ~60s puis réessayez.<br>'
-        + 'Ou <a href="https://console.mistral.ai" target="_blank" style="color:var(--mint)">passez au plan payant</a>.</div>';
-      el.style.borderColor='rgba(245,158,11,.35)';
-    } else if(e.message==='AUTH_401'){
-      el.innerHTML = '❌ Clé API invalide — <span style="color:var(--mint);cursor:pointer" onclick="openM(\'mApi\')">Configurer</span>';
-      el.style.borderColor='rgba(240,82,82,.4)';
-      setTimeout(()=>openM('mApi'),1200);
-    } else {
-      el.innerHTML = '❌ '+e.message;
-      el.style.borderColor='rgba(240,82,82,.4)';
-    }
-  }
+  mistralCall({ model: 'mistral-small-2506', messages: msgs, temperature: 0.2, max_tokens: 500 })
+    .then(function(rep) {
+      var stale2 = document.getElementById('__ld__');
+      if (stale2) stale2.parentNode.removeChild(stale2);
+      addMsg(rep, 'ai', true);
+      hist.push({ role: 'assistant', content: rep, date: Date.now() });
+      sl('s', 'ov_h', JSON.stringify(hist));
+    })
+    .catch(function(e) {
+      var stale2 = document.getElementById('__ld__');
+      if (stale2) stale2.parentNode.removeChild(stale2);
+      addMsg(aiErrMsg(e), 'ai', false);
+      if (e && e.status === 401) {
+        setTimeout(function() { openM('mApi'); }, 800);
+      }
+    })
+    .finally(function() { _aiInFlight = false; });
 }
 
-// ══════════════════════════════════════════
-// RENDU MESSAGES (Markdown)
-// ══════════════════════════════════════════
-function md(t){
-  if(!t) return '';
-  let s = String(t)
-    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-  s = s.replace(/^### (.+)$/gm,'<h4>$1</h4>');
-  s = s.replace(/^## (.+)$/gm,'<strong style="color:var(--blue);display:block;margin:6px 0 2px">$1</strong>');
-  s = s.replace(/\*\*\*(.+?)\*\*\*/g,'<strong><em>$1</em></strong>');
-  s = s.replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>');
-  s = s.replace(/\*([^\n]+?)\*/g,'<em>$1</em>');
-  s = s.replace(/`([^`]+)`/g,'<code>$1</code>');
-  s = s.replace(/^[-*] (.+)$/gm,'<li>$1</li>');
-  s = s.replace(/(<li>[\s\S]*?<\/li>)/g,m=>'<ul>'+m+'</ul>');
-  s = s.replace(/\n{2,}/g,'<br><br>');
-  s = s.replace(/\n/g,'<br>');
-  s = s.replace(/<br>(<\/?(h4|ul|li))/g,'$1');
-  s = s.replace(/(<\/?(h4|ul|li)>)<br>/g,'$1');
-  return s;
-}
-
-function addMsg(t, cls){
-  if(!t) return;
-  const chat = document.getElementById('cwin');
-  const d = document.createElement('div');
-  d.className = 'msg '+cls;
-  try{ d.innerHTML = md(String(t)); }catch(e){ d.textContent = String(t); }
-  chat.appendChild(d);
-  requestAnimationFrame(()=>requestAnimationFrame(()=>{
-    chat.scrollTop = chat.scrollHeight;
-  }));
-}
-
-function addMsgH(h, cls){
-  const chat = document.getElementById('cwin');
-  const d = document.createElement('div');
-  d.className = 'msg '+cls;
-  d.innerHTML = h||'';
-  chat.appendChild(d);
-  requestAnimationFrame(()=>requestAnimationFrame(()=>{
-    chat.scrollTop = chat.scrollHeight;
-  }));
-}
-
-// ══════════════════════════════════════════
-// CAMÉRA — Analyse Assiette (Pixtral)
-// ══════════════════════════════════════════
-let camStream = null;
-let plateB64  = null;
-
-const CARB_PROMPT = `Expert nutrition DT1 (CIQUAL 2024). Analyse cette assiette.
-RÉPONDS EN JSON STRICT (pas de markdown, pas de texte autour) :
-{"aliments":[{"nom":"nom","portion_g":150,"glucides_g":30.5,"gi":55}],"glucides_total":62.5,"calories_total":420,"message":"Conseil bref (IG, timing bolus)"}
-Règles: utilise CIQUAL · estime le poids visuellement · inclus sauces/huiles/pain · gi = index glycémique`;
-
-async function openCam(){
-  if(!key){ openM('mApi'); return; }
-  document.getElementById('mCam').classList.add('on');
-  resetCamPhases();
-  try{
-    camStream = await navigator.mediaDevices.getUserMedia({
-      video:{facingMode:{ideal:'environment'}, width:{ideal:1920}, height:{ideal:1080}}
-    });
-    const v = document.getElementById('plateVideo');
-    v.srcObject = camStream;
-    v.style.display = 'block';
-    await v.play();
-    document.getElementById('camStatus').style.display = 'none';
-    document.getElementById('camGuide').style.display = 'block';
-  }catch(err){
-    const st = document.getElementById('camStatus');
-    if(err.name==='NotAllowedError'||err.name==='PermissionDeniedError'){
-      st.innerHTML = '⚠️ Caméra refusée<br><br>'
-        +'<small>iOS: Réglages &gt; Safari &gt; Caméra<br>Android: icône 🔒 &gt; Caméra &gt; Autoriser</small><br><br>'
-        +'<button onclick="document.getElementById(\'fCamera\').click();closeCam()" '
-        +'style="background:var(--mint);border:none;color:var(--ink);padding:8px 16px;border-radius:10px;cursor:pointer;font-weight:600">📁 Galerie</button>';
-    } else if(err.name==='NotFoundError'){
-      st.innerHTML = '⚠️ Aucune caméra<br><br>'
-        +'<button onclick="document.getElementById(\'fCamera\').click();closeCam()" '
-        +'style="background:var(--mint);border:none;color:var(--ink);padding:8px 16px;border-radius:10px;cursor:pointer;font-weight:600">📁 Galerie</button>';
-    } else {
-      closeCam();
-      document.getElementById('fCamera').click();
-    }
-  }
-}
-
-function closeCam(){
-  if(camStream){ camStream.getTracks().forEach(t=>t.stop()); camStream=null; }
-  document.getElementById('mCam').classList.remove('on');
-}
-
-function resetCamPhases(){
-  document.getElementById('snapPhase').style.display     = 'block';
-  document.getElementById('previewPhase').style.display  = 'none';
-  document.getElementById('analyzingPhase').style.display= 'none';
-  document.getElementById('platePreview').style.display  = 'none';
-  document.getElementById('plateVideo').style.display    = 'none';
-  document.getElementById('camStatus').style.display     = 'block';
-  document.getElementById('camStatus').textContent       = 'Activation caméra…';
-  document.getElementById('camGuide').style.display      = 'none';
-}
-
-function snapPhoto(){
-  const v = document.getElementById('plateVideo');
-  if(!v.videoWidth) return;
-  const c = document.getElementById('plateCanvas');
-  c.width=v.videoWidth; c.height=v.videoHeight;
-  c.getContext('2d').drawImage(v,0,0);
-  // Compression max 1280px / 82% qualité
-  const maxW=1280; let w=c.width, h=c.height;
-  if(w>maxW){ h=Math.round(h*maxW/w); w=maxW; }
-  const sm = document.createElement('canvas');
-  sm.width=w; sm.height=h;
-  sm.getContext('2d').drawImage(c,0,0,w,h);
-  plateB64 = sm.toDataURL('image/jpeg',0.82);
-  const prev = document.getElementById('platePreview');
-  prev.src=plateB64; prev.style.display='block';
-  v.style.display='none';
-  document.getElementById('camGuide').style.display='none';
-  if(camStream){ camStream.getTracks().forEach(t=>t.stop()); camStream=null; }
-  document.getElementById('snapPhase').style.display    = 'none';
-  document.getElementById('previewPhase').style.display = 'block';
-}
-
-function retakePhoto(){
-  document.getElementById('platePreview').style.display  = 'none';
-  document.getElementById('previewPhase').style.display  = 'none';
-  plateB64 = null;
-  openCam();
-}
-
-async function analyzePlate(){
-  if(!plateB64) return;
-  document.getElementById('previewPhase').style.display   = 'none';
-  document.getElementById('analyzingPhase').style.display = 'block';
-  try{
-    const r = await fetch(API, {
-      method:'POST',
-      headers:{'Content-Type':'application/json','Authorization':'Bearer '+key},
-      body: JSON.stringify({
-        model: MDL_VIS,
-        messages:[{role:'user', content:[
-          {type:'text',       text: CARB_PROMPT},
-          {type:'image_url',  image_url:{url:plateB64}}
-        ]}],
-        temperature:0.1,
-        max_tokens:900
-      }),
-      signal: AbortSignal.timeout(40000)
-    });
-    if(!r.ok){
-      const e=await r.json().catch(()=>({}));
-      if(r.status===401) throw new Error('AUTH_401');
-      if(r.status===429) throw new Error('RATE_LIMIT');
-      throw new Error(e.message||'HTTP '+r.status);
-    }
-    const data = await r.json();
-    let raw = data.choices[0].message.content.trim()
-      .replace(/^```json\s*/i,'').replace(/^```\s*/,'').replace(/```\s*$/,'').trim();
-    let result;
-    try{ result = JSON.parse(raw); }
-    catch(_){
-      const m = raw.match(/\{[\s\S]+\}/);
-      if(m) result = JSON.parse(m[0]);
-      else throw new Error('JSON invalide');
-    }
-    closeCam();
-    renderCarbResult(result, plateB64);
-    plateB64=null;
-  }catch(err){
-    document.getElementById('analyzingPhase').style.display = 'none';
-    document.getElementById('previewPhase').style.display   = 'block';
-    if(err.message==='AUTH_401') openM('mApi');
-    else if(err.message==='RATE_LIMIT') addMsg('⏱️ Quota API dépassé — attendez ~60s puis réessayez.','ai');
-    else addMsg('❌ Erreur analyse : '+err.message,'ai');
-    closeCam();
-    plateB64=null;
-  }
-}
-
-function renderCarbResult(r, imgSrc){
-  addMsgH('<img src="'+imgSrc+'" class="prev-img" alt="Assiette">','usr');
-  const total  = parseFloat(r.glucides_total)||0;
-  const kcal   = r.calories_total||'';
-  const bRepas = Math.round(total/dt1.icr*10)/10;
-  const col    = total<30?'var(--mint)':total<60?'var(--amb)':'var(--red)';
-
-  let rows = (r.aliments||[]).map(a=>{
-    const gi=a.gi||0;
-    const giBadge = gi
-      ? `<span style="font-size:.64rem;padding:1px 5px;border-radius:4px;border:1px solid currentColor;${gi<55?'color:var(--mint)':gi<70?'color:var(--amb)':'color:var(--red)'}">IG${gi}</span>`
-      : '';
-    return `<div class="data-row">
-      <span style="font-size:.85rem">${a.nom} <small style="color:var(--tx3)">${a.portion_g}g</small> ${giBadge}</span>
-      <span style="color:var(--mint);font-family:'DM Mono',monospace">${parseFloat(a.glucides_g||0).toFixed(1)}g</span>
-    </div>`;
-  }).join('');
-
-  const html = `<div class="carb-card">
-    <div style="display:flex;align-items:baseline;gap:8px;margin-bottom:10px">
-      <span class="carb-total" style="color:${col}">${parseFloat(total).toFixed(1)}</span>
-      <span style="font-size:.85rem;color:var(--tx3)">g glucides${kcal?' · '+kcal+' kcal':''}</span>
-    </div>
-    ${rows}
-    <div class="tip" style="color:var(--blue);font-weight:600;margin-top:10px">
-      💉 Bolus repas suggéré : ${bRepas} U (ICR ${dt1.icr}g/U)
-    </div>
-    ${r.message?`<div class="tip">${r.message}</div>`:''}
-    <div class="tip" style="color:var(--tx3)">⚠️ Estimation visuelle — pesez vos aliments pour précision clinique</div>
-  </div>`;
-  addMsgH(html,'ai');
-
-  hist.push({role:'assistant', content:`Repas: ${total}g glucides`, carbs:total, date:Date.now()});
-  sl('s','ov_h',JSON.stringify(hist));
-}
-
-// Fallback input caméra natif
-function handleFileCam(e){
-  const file=e.target.files[0]; if(!file) return;
-  const reader=new FileReader();
-  reader.onload=async ev=>{
-    plateB64=ev.target.result; e.target.value='';
-    addMsgH('<img src="'+plateB64+'" class="prev-img">','usr');
-    const ld=document.createElement('div'); ld.className='msg ai'; ld.id='__ld__';
-    ld.innerHTML='<span class="dots"><span></span><span></span><span></span></span> Analyse Pixtral…';
-    document.getElementById('cwin').appendChild(ld);
-    requestAnimationFrame(()=>document.getElementById('cwin').scrollTop=document.getElementById('cwin').scrollHeight);
-    try{
-      const r=await fetch(API,{
-        method:'POST',
-        headers:{'Content-Type':'application/json','Authorization':'Bearer '+key},
-        body:JSON.stringify({model:MDL_VIS,messages:[{role:'user',content:[{type:'text',text:CARB_PROMPT},{type:'image_url',image_url:{url:plateB64}}]}],temperature:0.1,max_tokens:900}),
-        signal:AbortSignal.timeout(40000)
-      });
-      if(!r.ok) throw new Error('HTTP '+r.status);
-      const data=await r.json();
-      let raw=data.choices[0].message.content.trim().replace(/^```json\s*/i,'').replace(/```\s*$/,'').trim();
-      let result;
-      try{result=JSON.parse(raw);}catch(_){const m=raw.match(/\{[\s\S]+\}/);if(m)result=JSON.parse(m[0]);else throw new Error('JSON invalide');}
-      document.getElementById('__ld__')?.remove();
-      renderCarbResult(result,plateB64);
-    }catch(err){
-      document.getElementById('__ld__')?.remove();
-      addMsg('❌ Erreur analyse : '+err.message,'ai');
-    }
-    plateB64=null;
-  };
-  reader.readAsDataURL(file);
-}
-
-// ══════════════════════════════════════════
-// OPEN FOOD FACTS
-// ══════════════════════════════════════════
-const offCache = {};
-
-async function searchOFF(q){
-  const k=q.toLowerCase().trim();
-  if(offCache[k]) return offCache[k];
-  try{
-    const r=await fetch(
-      'https://world.openfoodfacts.org/cgi/search.pl?search_terms='
-      +encodeURIComponent(k)+'&json=1&page_size=3&action=process&fields=product_name,nutriments,nutrition_grades',
-      {signal:AbortSignal.timeout(6000)}
-    );
-    if(!r.ok) throw new Error();
-    const d=await r.json();
-    const ps=(d.products||[]).filter(p=>p.nutriments&&p.nutriments['carbohydrates_100g']!==undefined&&p.product_name).slice(0,3);
-    offCache[k]=ps; return ps;
-  }catch(e){ return null; }
-}
-
-function offCard(p){
-  const n=p.nutriments||{};
-  const name=(p.product_name||'Produit').substring(0,40);
-  const gr=(p.nutrition_grades||'?').toUpperCase();
-  const gc=['A','B','C','D','E'].includes(gr)?'n'+gr.toLowerCase():'nu';
-  function bar(l,v,m,cl){
-    if(v===undefined||v===null) return '';
-    const pt=Math.min(100,Math.round(v/m*100));
-    return `<div class="om"><div class="oml">${l}</div><div class="omv">${parseFloat(v).toFixed(1)}g</div><div class="omb"><div class="omf ${cl}" style="width:${pt}%"></div></div></div>`;
-  }
-  const cal=n['energy-kcal_100g'];
-  return `<div class="ofc">
-    <div class="ofh">
-      <div class="ofn">🥗 ${name}</div>
-      <span class="ofs">OFF</span>
-      <span class="nsb ${gc}">${gr==='?'?'?':gr}</span>
-    </div>
-    <div class="ofm">
-      ${bar('Glucides',n['carbohydrates_100g'],80,'bc')}
-      ${cal?`<div class="om"><div class="oml">Énergie</div><div class="omv">${parseFloat(cal).toFixed(0)} kcal</div><div class="omb"><div class="omf bk" style="width:${Math.min(100,Math.round(cal/500*100))}%"></div></div></div>`:''}
-      ${bar('Protéines',n['proteins_100g'],40,'bp')}
-      ${bar('Lipides',n['fat_100g'],50,'bl')}
-      ${bar('Fibres',n['fiber_100g'],15,'bf')}
-    </div>
-    <div class="ofl">Open Food Facts (CC BY-SA) · Pour 100g</div>
-  </div>`;
-}
-
-function showOFFSearch(){
-  const chat=document.getElementById('cwin');
-  const id='off'+Date.now();
-  const d=document.createElement('div'); d.className='msg ai';
-  d.innerHTML=`<div style="font-family:'DM Mono',monospace;font-size:.78rem;color:var(--mint);margin-bottom:6px">🔍 Recherche aliment</div>
-    <div class="off-sw">
-      <input type="text" class="off-si" id="ofsi-${id}" placeholder="Ex: pain, banane, nutella…" autocomplete="off"
-             onkeydown="if(event.key==='Enter')runOFF('${id}')">
-      <button class="off-sb" onclick="runOFF('${id}')">Chercher</button>
-    </div>
-    <div id="offr-${id}"></div>`;
-  chat.appendChild(d);
-  requestAnimationFrame(()=>{
-    chat.scrollTop=chat.scrollHeight;
-    setTimeout(()=>document.getElementById('ofsi-'+id)?.focus(),150);
-  });
-}
-
-async function runOFF(id){
-  const inp=document.getElementById('ofsi-'+id);
-  const res=document.getElementById('offr-'+id);
-  if(!inp||!res) return;
-  const q=inp.value.trim(); if(!q) return;
-  res.innerHTML='<div class="off-sg">Recherche…</div>';
-  const ps=await searchOFF(q);
-  if(ps&&ps.length) res.innerHTML=ps.map(p=>offCard(p)).join('');
-  else res.innerHTML='<div style="color:#fca5a5;font-size:.82rem;margin-top:6px">Aucun résultat pour "'+q+'"</div>';
-  requestAnimationFrame(()=>{ document.getElementById('cwin').scrollTop=document.getElementById('cwin').scrollHeight; });
-}
-
-// ══════════════════════════════════════════
-// 🧠 BILAN IA — Pattern Recognition
-// ══════════════════════════════════════════
-async function runAIBilan(){
-  if(!key){ openM('mApi'); return; }
+/* ════════════════════════════════════════════════════════════════════════
+   BILAN IA
+════════════════════════════════════════════════════════════════════════ */
+function runAIBilan() {
+  if (!apiKey) { openM('mApi'); return; }
   openM('mBilan');
-  const div = document.getElementById('bilanDiv');
-  div.innerHTML = '<span class="dots"><span></span><span></span><span></span></span> Analyse des schémas en cours…';
+  var div = $('bilanContent');
+  div.innerHTML = '<span class="dots"><span></span><span></span><span></span></span> Analyse en cours\u2026';
 
-  const pts = hist.filter(h=>h.bg!==undefined||h.carbs!==undefined).slice(-24);
-  const log = pts.map(h=>{
-    const t=new Date(h.date||Date.now()).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});
-    return h.bg ? `[${t}] Glycémie: ${h.bg} mg/dL` : `[${t}] Repas: ${h.carbs}g glucides`;
+  var recent = hist.filter(function(h) { return h.bg || h.carbs || h.bolus; }).slice(-20);
+  var log    = recent.map(function(h) {
+    var t = new Date(h.date).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+    if (h.bg)    return '[' + t + '] Glyc\u00e9mie: ' + h.bg + ' mg/dL';
+    if (h.carbs) return '[' + t + '] Repas: ' + h.carbs + 'g glucides';
+    if (h.bolus) return '[' + t + '] Bolus: ' + h.bolus + ' U';
+    return '';
   }).join('\n');
 
-  const prompt = `Tu es un algorithme d'endocrinologie spécialisé DT1.
-Paramètres: ICR=${dt1.icr}g/U · ISF=${dt1.isf}mg/dL/U · Cible=${dt1.tgt}mg/dL · DIA=${dt1.dia}h
+  var prompt = 'Tu es sp\u00e9cialiste DT1. Param\u00e8tres\u00a0: ICR=' + dt1.icr
+             + ', ISF=' + dt1.isf + ', Cible=' + dt1.target + '.\n'
+             + 'Historique\u00a0:\n' + log + '\n'
+             + 'Analyse les sch\u00e9mas, identifie les tendances et sugg\u00e8re des ajustements en 3\u20134 points cl\u00e9s.';
 
-Historique récent:
-${log||'Aucune donnée enregistrée.'}
-
-Réponds en 3 sections (titres ###):
-### Schémas détectés
-### Prédictions & Alertes
-### Auto-Tuning suggéré
-
-Sois concis et clinique. Max 300 mots.`;
-
-  try{
-    const r=await fetch(API,{
-      method:'POST',
-      headers:{'Content-Type':'application/json','Authorization':'Bearer '+key},
-      body:JSON.stringify({model:MDL_TEXT,messages:[{role:'user',content:prompt}],temperature:0.3,max_tokens:700}),
-      signal:AbortSignal.timeout(30000)
+  mistralCall(
+    { model: 'mistral-small-2506', messages: [{ role: 'user', content: prompt }], temperature: 0.3, max_tokens: 650 }
+  )
+    .then(function(rep) {
+      div.innerHTML = md(rep);
+      speak(rep);
+    })
+    .catch(function(e) {
+      div.innerHTML = '<span style="color:var(--am)">' + aiErrMsg(e) + '</span>';
+      if (e && e.status === 401) {
+        setTimeout(function() { closeM('mBilan'); openM('mApi'); }, 1200);
+      }
     });
-    if(!r.ok) throw new Error('HTTP '+r.status);
-    const data=await r.json();
-    div.innerHTML=md(data.choices[0].message.content);
-  }catch(err){
-    div.innerHTML='❌ Erreur : '+err.message;
-  }
 }
 
-// ══════════════════════════════════════════
-// 📊 STATISTIQUES
-// ══════════════════════════════════════════
-let gcChart=null;
+/* ════════════════════════════════════════════════════════════════════════
+   STATS CHART
+════════════════════════════════════════════════════════════════════════ */
+var trackerChart = null;
 
-function openStats(){
+function openStats() {
   openM('mStats');
-  const ctx=document.getElementById('gcChart').getContext('2d');
-  const pts=hist.filter(h=>h.bg!==undefined||h.carbs!==undefined);
+  var ctx    = $('trackerChart').getContext('2d');
+  var labels = [], carbsArr = [], bgArr = [];
 
-  const labels = pts.map(h=>new Date(h.date||Date.now()).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'}));
-  const bgs    = pts.map(h=>h.bg||null);
-  const carbs  = pts.map(h=>h.carbs||0);
+  hist.forEach(function(h) {
+    if (h.carbs !== undefined || h.bg !== undefined) {
+      labels.push(new Date(h.date || Date.now()).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }));
+      carbsArr.push(h.carbs || 0);
+      bgArr.push(h.bg || null);
+    }
+  });
 
-  // Stats 24h
-  const now=Date.now(), d24=24*3600*1000;
-  const bgVals=hist.filter(h=>h.bg&&(now-h.date<d24)).map(h=>h.bg);
-  const mean  = bgVals.length ? Math.round(bgVals.reduce((a,b)=>a+b,0)/bgVals.length) : 0;
-  const tir   = bgVals.length ? Math.round(bgVals.filter(v=>v>=70&&v<=180).length/bgVals.length*100) : 0;
-  const hba1c = mean ? ((mean+46.7)/28.7).toFixed(1) : '-';
+  if (trackerChart) { trackerChart.destroy(); }
 
-  document.getElementById('statsGrid').innerHTML=[
-    {l:'Moy. glycémie', v:mean?mean+' mg/dL':'-', c:'var(--blue)'},
-    {l:'Temps cible (TIR)', v:tir?tir+'%':'-', c:'var(--mint)'},
-    {l:'HbA1c estimée', v:hba1c!=='-'?hba1c+'%':'-', c:'var(--pur)'},
-  ].map(s=>`<div class="stat-box">
-    <div class="stat-lbl">${s.l}</div>
-    <div class="stat-val" style="color:${s.c}">${s.v}</div>
-  </div>`).join('');
-
-  if(gcChart) gcChart.destroy();
-  gcChart=new Chart(ctx,{
-    type:'bar',
-    data:{
-      labels: labels.length ? labels : ['Aucune donnée'],
-      datasets:[
+  trackerChart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: labels.length ? labels : ['\u2014'],
+      datasets: [
         {
-          type:'line', label:'Glycémie (mg/dL)', data:bgs,
-          borderColor:'#4da6ff', backgroundColor:'rgba(77,166,255,.08)',
-          pointBackgroundColor:bgs.map(v=>!v?'transparent':v<70?'#f59e0b':v>180?'#f05252':'#00e5a0'),
-          borderWidth:2, pointRadius:4, spanGaps:true, yAxisID:'yBg'
+          type: 'line',
+          label: 'Glyc\u00e9mie (mg/dL)',
+          data: bgArr,
+          borderColor: '#4faaff',
+          backgroundColor: 'rgba(79,170,255,.15)',
+          borderWidth: 2,
+          pointRadius: 4,
+          spanGaps: true,
+          yAxisID: 'yBg',
+          tension: .3
         },
         {
-          type:'bar', label:'Glucides (g)', data:carbs,
-          backgroundColor:'rgba(0,229,160,.4)', yAxisID:'yC'
+          type: 'bar',
+          label: 'Glucides (g)',
+          data: carbsArr,
+          backgroundColor: 'rgba(0,232,164,.42)',
+          yAxisID: 'yCarbs',
+          borderRadius: 4
         }
       ]
     },
-    options:{
-      responsive:true, maintainAspectRatio:false,
-      scales:{
-        yBg:{type:'linear',position:'left',min:40,max:360,grid:{color:'rgba(255,255,255,.05)'},ticks:{color:'#50576a',font:{size:10}}},
-        yC: {type:'linear',position:'right',grid:{display:false},ticks:{color:'#50576a',font:{size:10}}},
-        x:  {grid:{color:'rgba(255,255,255,.04)'},ticks:{color:'#50576a',font:{size:9},maxTicksLimit:8}}
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          labels: {
+            color: '#6e7d99',
+            font: { family: "'JetBrains Mono'", size: 10 }
+          }
+        }
       },
-      plugins:{
-        legend:{labels:{color:'#8b93a8',font:{size:11}}},
-        tooltip:{callbacks:{label:c=>`${c.dataset.label}: ${c.parsed.y??'-'}`}}
+      scales: {
+        yBg: {
+          type: 'linear', position: 'left',
+          min: 40, max: 350,
+          ticks: { color: '#4faaff', font: { family: "'JetBrains Mono'", size: 10 } },
+          grid:  { color: 'rgba(255,255,255,.04)' }
+        },
+        yCarbs: {
+          type: 'linear', position: 'right',
+          grid: { display: false },
+          ticks: { color: '#00e8a4', font: { family: "'JetBrains Mono'", size: 10 } }
+        }
       }
     }
   });
 }
+
+/* ════════════════════════════════════════════════════════════════════════
+   EXPORT / IMPORT
+════════════════════════════════════════════════════════════════════════ */
+function exportData() {
+  var payload = JSON.stringify({
+    hist: sl('g', 'ov_h'),
+    icr: dt1.icr, isf: dt1.isf,
+    tgt: dt1.target, dia: dt1.dia
+  });
+  var blob = new Blob([payload], { type: 'application/json' });
+  var a    = document.createElement('a');
+  a.href   = URL.createObjectURL(blob);
+  a.download = 'openvita_dt1.json';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(a.href);
+}
+
+function importData(event) {
+  var file = event.target.files[0];
+  if (!file) return;
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      var data = JSON.parse(e.target.result);
+      if (data.hist) sl('s', 'ov_h', data.hist);
+      alert('\u2705 Importation r\u00e9ussie\u00a0!');
+      location.reload();
+    } catch (err) {
+      alert('\u274C Fichier invalide.');
+    }
+  };
+  reader.readAsText(file);
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   CAMERA / PLATE ANALYSIS
+════════════════════════════════════════════════════════════════════════ */
+var plateStream   = null;
+var plateImageB64 = null;
+
+var CARB_PROMPT = 'Tu es expert nutrition DT1. Analyse l\'assiette photo.'
+                + ' REPONDS EN JSON STRICT UNIQUEMENT, sans texte avant ou apr\u00e8s\u00a0:'
+                + ' {"aliments":[{"nom":"nom","portion_g":150,"glucides_g":30.5}],'
+                + '"glucides_total":62.5,"message":"Astuce courte"}';
+
+function openPlateModal() {
+  if (!apiKey) { openM('mApi'); return; }
+
+  $('plateModal').classList.add('on');
+  $('snapPhase').style.display     = 'block';
+  $('previewPhase').style.display  = 'none';
+  $('analyzingPhase').style.display = 'none';
+  $('platePreview').style.display  = 'none';
+  plateImageB64 = null;
+
+  navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
+    .then(function(stream) {
+      plateStream = stream;
+      $('plateVideo').srcObject = stream;
+      $('plateVideo').style.display = 'block';
+    })
+    .catch(function() {
+      closePlateModal();
+      $('fInput').click();
+    });
+}
+
+function closePlateModal() {
+  if (plateStream) {
+    plateStream.getTracks().forEach(function(t) { t.stop(); });
+    plateStream = null;
+  }
+  $('plateModal').classList.remove('on');
+}
+
+function snapPhoto() {
+  var v = $('plateVideo');
+  var c = $('plateCanvas');
+  c.width  = v.videoWidth;
+  c.height = v.videoHeight;
+  c.getContext('2d').drawImage(v, 0, 0);
+  plateImageB64 = c.toDataURL('image/jpeg', 0.8);
+  $('platePreview').src          = plateImageB64;
+  $('platePreview').style.display = 'block';
+  v.style.display                = 'none';
+  $('snapPhase').style.display   = 'none';
+  $('previewPhase').style.display = 'block';
+  // Stop camera stream after snap
+  if (plateStream) {
+    plateStream.getTracks().forEach(function(t) { t.stop(); });
+    plateStream = null;
+    v.srcObject = null;
+  }
+}
+
+function retakePhoto() {
+  $('platePreview').style.display  = 'none';
+  $('previewPhase').style.display  = 'none';
+  $('analyzingPhase').style.display = 'none';
+  $('snapPhase').style.display     = 'block';
+  var v = $('plateVideo');
+  v.style.display = 'block';
+  navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
+    .then(function(stream) {
+      plateStream = stream;
+      v.srcObject = stream;
+    })
+    .catch(function() {
+      closePlateModal();
+      $('fInput').click();
+    });
+}
+
+function analyzePlate() {
+  $('previewPhase').style.display   = 'none';
+  $('analyzingPhase').style.display = 'block';
+
+  var payload = {
+    model: 'pixtral-12b-2409',
+    messages: [{
+      role: 'user',
+      content: [
+        { type: 'text',      text: CARB_PROMPT },
+        { type: 'image_url', image_url: { url: plateImageB64 } }
+      ]
+    }],
+    temperature: 0.1,
+    max_tokens: 1000
+  };
+
+  mistralCall(payload, { retries: 1 })
+    .then(function(raw) {
+      var clean = raw.trim().replace(/```json/gi, '').replace(/```/g, '').trim();
+      var match = clean.match(/\{[\s\S]+\}/);
+      if (!match) throw { message: 'no_json' };
+      var result = JSON.parse(match[0]);
+      closePlateModal();
+      renderCarbResult(result, plateImageB64);
+    })
+    .catch(function(e) {
+      closePlateModal();
+      if (!e || e.message === 'no_json' || e instanceof SyntaxError) {
+        addMsg('\u26A0\uFE0F Pixtral n\'a pas renvoy\u00e9 un JSON valide. Essayez avec une image plus nette.', 'ai', false);
+      } else {
+        addMsg(aiErrMsg(e), 'ai', false);
+        if (e && e.status === 401) setTimeout(function() { openM('mApi'); }, 800);
+      }
+    });
+}
+
+function renderCarbResult(r, imgSrc) {
+  addMsgHTML('<img src="' + imgSrc + '" class="prev-img" alt="Repas analys\u00e9">', 'usr');
+
+  var total      = parseFloat(r.glucides_total) || 0;
+  var bolusRepas = total / dt1.icr;
+  var iob        = getIOB();
+  var finalBolus = bolusRepas;
+  var iobHTML    = '';
+
+  if (iob > 0) {
+    finalBolus = Math.max(0, bolusRepas - iob);
+    iobHTML    = '<div class="iob-note">'
+               + 'D\u00e9duction de ' + iob.toFixed(1) + ' U d\'Insuline Active (IOB)'
+               + '</div>';
+  }
+
+  var rows = (r.aliments || []).map(function(a) {
+    return '<div class="carb-row"><span>' + a.nom + '</span><span>' + a.glucides_g + 'g</span></div>';
+  }).join('');
+
+  var capM      = maxBolus();
+  var safeFinal = capM ? Math.min(finalBolus, capM) : finalBolus;
+  var capWarnH  = (capM && finalBolus > capM)
+    ? '<div class="bolus-warn">\u26A0\uFE0F Bolus r\u00e9duit au cap (' + capM + ' U = 20% TDD). Consultez votre m\u00e9decin.</div>'
+    : '';
+  var html = '<div class="carb-result">'
+           + '<div class="carb-total">' + total + 'g<span>glucides estim\u00e9s</span></div>'
+           + '<div class="carb-rows">' + rows + '</div>'
+           + '<div class="plate-tip">\uD83D\uDC89 Bolus sugg\u00e9r\u00e9\u00a0: ' + safeFinal.toFixed(1) + ' U</div>'
+           + iobHTML + capWarnH
+           + (safeFinal > 0
+               ? '<button class="iob-btn" onclick="logBolus(' + safeFinal.toFixed(1) + ',this)">'
+                 + "\uD83D\uDC89 Confirmer l'injection de " + safeFinal.toFixed(1) + " U</button>"
+               : '')
+           + '</div>';
+
+  addMsgHTML(html, 'ai');
+  speak('Repas analys\u00e9\u00a0: ' + total + ' grammes de glucides. Bolus sugg\u00e9r\u00e9\u00a0: ' + finalBolus.toFixed(1) + ' unit\u00e9s.');
+
+  hist.push({ role: 'assistant', content: 'Repas\u00a0: ' + total + 'g glucides.', carbs: total, date: Date.now() });
+  sl('s', 'ov_h', JSON.stringify(hist));
+  updateIOBUI();
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   FILE INPUT (import image from gallery)
+════════════════════════════════════════════════════════════════════════ */
+document.getElementById('ageIn').addEventListener('input', refreshCalcSuggest);
+document.getElementById('poidsIn').addEventListener('input', refreshCalcSuggest);
+
+document.getElementById('fInput').addEventListener('change', function(e) {
+  var file = e.target.files[0];
+  if (!file) return;
+
+  if (!apiKey) {
+    e.target.value = '';
+    openM('mApi');
+    return;
+  }
+
+  var reader = new FileReader();
+  reader.onload = function(ev) {
+    plateImageB64 = ev.target.result;
+    $('plateModal').classList.add('on');
+    $('snapPhase').style.display      = 'none';
+    $('previewPhase').style.display   = 'none';
+    $('analyzingPhase').style.display = 'none';
+    analyzePlate();
+  };
+  reader.readAsDataURL(file);
+  e.target.value = '';
+});
 </script>
 </body>
 </html>
