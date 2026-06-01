@@ -814,11 +814,21 @@ const safeStorage = (() => {
   if (!('serviceWorker' in navigator) || location.protocol !== 'https:') return;
   const swCode = [
     'self.addEventListener("install",function(e){',
-    '  e.waitUntil(caches.open("ov-v5").then(function(c){return c.addAll(["./"]);}));',
-    '});',
+    '  try {
+  const c = await e.waitUntil(caches.open("ov-v5");
+  return c.addAll(["./"]);}));',
+    '
+} catch(e) {
+  console.error(e)
+};',
     'self.addEventListener("fetch",function(e){',
-    '  e.respondWith(caches.match(e.request).then(function(r){return r||fetch(e.request);}));',
-    '});'
+    '  try {
+  const r = await e.respondWith(caches.match(e.request);
+  return r||fetch(e.request);}));',
+    '
+} catch(e) {
+  console.error(e)
+};'
   ].join('');
   navigator.serviceWorker.register(
     URL.createObjectURL(new Blob([swCode], { type: 'application/javascript' }))
@@ -1509,12 +1519,15 @@ function callAI() {
     [{ role: 'system', content: sysContent }].concat(hist.slice(-12))
   );
 
-  mistralCall({ model: 'mistral-small-2506', messages: msgs, temperature: 0.2, max_tokens: 500 })
-    .then(function(rep) {
-      const stale2 = document.getElementById('__ld__');
+  try {
+  const rep = await mistralCall({ model: 'mistral-small-2506', messages: msgs, temperature: 0.2, max_tokens: 500 });
+  const stale2 = document.getElementById('__ld__');
       if (stale2) stale2.parentNode.removeChild(stale2);
       addMsg(rep, 'ai', true);
-      hist.push({ role: 'assistant', content: rep, date: Date.now() });
+      hist.push({ role: 'assistant', content: rep, date: Date.now()
+} catch(e) {
+  console.error(e)
+};
       sl('s', 'ov_h', JSON.stringify(hist));
     })
     .catch(function(e) {
@@ -1551,19 +1564,18 @@ function runAIBilan() {
              + 'Historique\u00a0:\n' + log + '\n'
              + 'Analyse les sch\u00e9mas, identifie les tendances et sugg\u00e8re des ajustements en 3\u20134 points cl\u00e9s.';
 
-  mistralCall(
+  try {
+  const rep = await mistralCall(
     { model: 'mistral-small-2506', messages: [{ role: 'user', content: prompt }], temperature: 0.3, max_tokens: 650 }
-  )
-    .then(function(rep) {
-      div.innerHTML = md(rep);
+  );
+  div.innerHTML = md(rep);
       speak(rep);
-    })
-    .catch(function(e) {
-      div.innerHTML = '<span style="color:var(--am)">' + aiErrMsg(e) + '</span>';
+} catch(e) {
+  div.innerHTML = '<span style="color:var(--am)">' + aiErrMsg(e) + '</span>';
       if (e && e.status === 401) {
         setTimeout(function() { closeM('mBilan'); openM('mApi'); }, 1200);
       }
-    });
+};
 }
 
 /* ════════════════════════════════════════════════════════════════════════
@@ -1698,12 +1710,14 @@ function openPlateModal() {
   $('platePreview').style.display  = 'none';
   plateImageB64 = null;
 
-  navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
-    .then(function(stream) {
-      plateStream = stream;
+  try {
+  const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+  plateStream = stream;
       $('plateVideo').srcObject = stream;
       $('plateVideo').style.display = 'block';
-    })
+} catch(e) {
+  console.error(e)
+}
     .catch(function() {
       closePlateModal();
       $('fInput').click();
@@ -1745,11 +1759,13 @@ function retakePhoto() {
   $('snapPhase').style.display     = 'block';
   const v = $('plateVideo');
   v.style.display = 'block';
-  navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
-    .then(function(stream) {
-      plateStream = stream;
+  try {
+  const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+  plateStream = stream;
       v.srcObject = stream;
-    })
+} catch(e) {
+  console.error(e)
+}
     .catch(function() {
       closePlateModal();
       $('fInput').click();
@@ -1773,24 +1789,23 @@ function analyzePlate() {
     max_tokens: 1000
   };
 
-  mistralCall(payload, { retries: 1 })
-    .then(function(raw) {
-      const clean = raw.trim().replace(/```json/gi, '').replace(/```/g, '').trim();
+  try {
+  const raw = await mistralCall(payload, { retries: 1 });
+  const clean = raw.trim().replace(/```json/gi, '').replace(/```/g, '').trim();
       const match = clean.match(/\{[\s\S]+\}/);
       if (!match) throw { message: 'no_json' };
       const result = JSON.parse(match[0]);
       closePlateModal();
       renderCarbResult(result, plateImageB64);
-    })
-    .catch(function(e) {
-      closePlateModal();
+} catch(e) {
+  closePlateModal();
       if (!e || e.message === 'no_json' || e instanceof SyntaxError) {
         addMsg('\u26A0\uFE0F Pixtral n\'a pas renvoy\u00e9 un JSON valide. Essayez avec une image plus nette.', 'ai', false);
       } else {
         addMsg(aiErrMsg(e), 'ai', false);
         if (e && e.status === 401) setTimeout(function() { openM('mApi'); }, 800);
       }
-    });
+};
 }
 
 function renderCarbResult(r, imgSrc) {
