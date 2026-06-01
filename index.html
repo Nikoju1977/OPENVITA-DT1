@@ -520,7 +520,12 @@
       font-size: .72rem; color: var(--am); margin-top: 6px; padding: 5px 9px;
       background: var(--am-d); border-radius: var(--r1); border-left: 2px solid var(--am-b);
     }
-  </style>
+  
+/* ── Skeleton Loader ─────────────────────────── */
+.skeleton{background:linear-gradient(90deg,rgba(0,255,157,.07) 25%,rgba(0,255,157,.15) 50%,rgba(0,255,157,.07) 75%);background-size:200% 100%;animation:skel-wave 1.4s infinite;border-radius:6px;min-height:1em}
+@keyframes skel-wave{0%{background-position:200% 0}100%{background-position:-200% 0}}
+
+</style>
   <meta name="description" content="OpenVita DT1 — Application de gestion du Diabète de Type 1. Calculateur bolus oref1, Nightscout CGM.">
   <meta name="author" content="Nicolas Julienne — Studio Niko Design">
   <meta name="theme-color" content="#00d4ff">
@@ -532,7 +537,10 @@
   <meta name="twitter:title" content="OpenVita DT1 | Studio Niko Design">
   <meta name="twitter:description" content="Gestion Diabète Type 1 — bolus oref1, CGM Nightscout, CIQUAL 2024, suivi glycémique avancé">
 </head>
-<body>
+<body role="application" aria-label="OpenVita DT1 — Gestion diabète type 1">
+<main id="app" tabindex="-1">
+<h1 style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap">OpenVita DT1</h1>
+
 
 <!-- ════ SETTINGS MODAL ═══════════════════════════════════════════════════ -->
 <div class="modal" id="mApi">
@@ -707,7 +715,7 @@
 ════════════════════════════════════════════════════════════════════════ */
 (function registerSW() {
   if (!('serviceWorker' in navigator) || location.protocol !== 'https:') return;
-  var swCode = [
+  const swCode = [
     'self.addEventListener("install",function(e){',
     '  e.waitUntil(caches.open("ov-v5").then(function(c){return c.addAll(["./"]);}));',
     '});',
@@ -742,11 +750,11 @@ function ts() {
 
 /** Open / close modal */
 function openM(id) {
-  var el = $(id);
+  const el = $(id);
   if (el) { el.style.display = 'flex'; el.classList.add('on'); }
 }
 function closeM(id) {
-  var el = $(id);
+  const el = $(id);
   if (el) { el.style.display = 'none'; el.classList.remove('on'); }
 }
 
@@ -760,27 +768,27 @@ function md(text) {
 /* ════════════════════════════════════════════════════════════════════════
    STATE
 ════════════════════════════════════════════════════════════════════════ */
-var apiKey     = sl('g', 'ov_k')   || '';
-var ttsEnabled = sl('g', 'ov_tts') === '1';
-var patient = {
+const apiKey     = sl('g', 'ov_k')   || '';
+const ttsEnabled = sl('g', 'ov_tts') === '1';
+const patient = {
   prenom: sl('g', 'ov_prenom') || '',
   age:    parseFloat(sl('g', 'ov_age'))   || 0,
   poids:  parseFloat(sl('g', 'ov_poids')) || 0
 };
 function isChild()     { return patient.age > 0 && patient.age < 18; }
 function estimateTDD() { if (!patient.poids) return null; return Math.round(patient.poids * (isChild() ? 0.4 : 0.5) * 10) / 10; }
-function maxBolus()    { var t = estimateTDD(); return t ? Math.round(t * 0.20 * 10) / 10 : null; }
+function maxBolus()    { const t = estimateTDD(); return t ? Math.round(t * 0.20 * 10) / 10 : null; }
 function hypoCarbDose(){ if (isChild() && patient.poids > 0) return Math.max(3, Math.min(15, Math.round(patient.poids * 0.3))); return 15; }
 function bgTargetRange(){ return isChild() ? [80, 150] : [70, 180]; }
-var dt1 = {
+const dt1 = {
   icr:    parseFloat(sl('g', 'ov_icr'))  || 10,
   isf:    parseFloat(sl('g', 'ov_isf'))  || 40,
   target: parseFloat(sl('g', 'ov_tgt'))  || 100,
   dia:    parseFloat(sl('g', 'ov_dia'))  || 4
 };
-var hist = [];
+const hist = [];
 try {
-  var raw = sl('g', 'ov_h');
+  const raw = sl('g', 'ov_h');
   hist = raw ? JSON.parse(raw) : [];
 } catch (e) { hist = []; }
 
@@ -788,12 +796,12 @@ try {
    IOB — Insuline On Board
 ════════════════════════════════════════════════════════════════════════ */
 function getIOB() {
-  var now    = Date.now();
-  var diaMs  = (dt1.dia || 4) * 3600000;
-  var total  = 0;
+  const now    = Date.now();
+  const diaMs  = (dt1.dia || 4) * 3600000;
+  const total  = 0;
   hist.forEach(function(h) {
     if (h.bolus && h.date) {
-      var elapsed = now - h.date;
+      const elapsed = now - h.date;
       if (elapsed < diaMs) {
         total += h.bolus * (1 - elapsed / diaMs);
       }
@@ -803,8 +811,8 @@ function getIOB() {
 }
 
 function updateIOBUI() {
-  var iob  = getIOB();
-  var badge = $('iobBadge');
+  const iob  = getIOB();
+  const badge = $('iobBadge');
   if (!badge) return;
   if (iob > 0.1) {
     badge.textContent = '\u1F489 IOB ' + iob.toFixed(1) + ' U';
@@ -815,20 +823,20 @@ function updateIOBUI() {
 }
 
 function updateBGChip(bg) {
-  var chip  = $('bgChip');
+  const chip  = $('bgChip');
   if (!chip) return;
-  var range = bgTargetRange();
-  var color = bg > range[1] ? 'var(--am)' : bg < range[0] ? 'var(--rd)' : 'var(--m)';
+  const range = bgTargetRange();
+  const color = bg > range[1] ? 'var(--am)' : bg < range[0] ? 'var(--rd)' : 'var(--m)';
   chip.textContent = '\uD83E\uDE78 ' + bg + ' mg/dL';
   chip.style.color = color;
   chip.style.borderColor = color;
   chip.style.display = 'inline-flex';
 }
 function updatePatientBadge() {
-  var b = $('patientBadge');
+  const b = $('patientBadge');
   if (!b) return;
   if (!patient.prenom && !patient.age) { b.style.display = 'none'; return; }
-  var label = patient.prenom || '';
+  const label = patient.prenom || '';
   if (patient.age) label += (label ? ', ' : '') + patient.age + '\u00a0ans';
   if (isChild())   label += '\u00a0\uD83D\uDC76';
   b.textContent = label;
@@ -849,7 +857,7 @@ function stripHTML(html) {
 
 function getFRVoice() {
   if (!window.speechSynthesis) return null;
-  var voices = window.speechSynthesis.getVoices();
+  const voices = window.speechSynthesis.getVoices();
   return (
     voices.find(function(v) { return v.lang.startsWith('fr') && !v.name.includes('Google'); }) ||
     voices.find(function(v) { return v.lang.startsWith('fr'); }) ||
@@ -860,12 +868,12 @@ function getFRVoice() {
 function speak(text) {
   if (!ttsEnabled || !window.speechSynthesis) return;
   window.speechSynthesis.cancel();
-  var utt    = new SpeechSynthesisUtterance(stripHTML(text));
+  const utt    = new SpeechSynthesisUtterance(stripHTML(text));
   utt.lang   = 'fr-FR';
   utt.rate   = 1.05;
   utt.pitch  = 1;
   utt.volume = 1;
-  var voice  = getFRVoice();
+  const voice  = getFRVoice();
   if (voice) utt.voice = voice;
   window.speechSynthesis.speak(utt);
 }
@@ -874,10 +882,10 @@ function speakOne(btnEl, text) {
   if (!window.speechSynthesis) return;
   if (window.speechSynthesis.speaking) { window.speechSynthesis.cancel(); return; }
   btnEl.classList.add('speaking');
-  var utt   = new SpeechSynthesisUtterance(stripHTML(text));
+  const utt   = new SpeechSynthesisUtterance(stripHTML(text));
   utt.lang  = 'fr-FR';
   utt.rate  = 1.05;
-  var voice = getFRVoice();
+  const voice = getFRVoice();
   if (voice) utt.voice = voice;
   utt.onend  = function() { btnEl.classList.remove('speaking'); };
   utt.onerror = function() { btnEl.classList.remove('speaking'); };
@@ -891,8 +899,8 @@ function toggleTTS() {
 }
 
 function updateTTSUI() {
-  var tog = $('togTTS');
-  var btn = $('ttsBtn');
+  const tog = $('togTTS');
+  const btn = $('ttsBtn');
   if (tog) {
     if (ttsEnabled) tog.classList.add('on');
     else            tog.classList.remove('on');
@@ -912,15 +920,15 @@ if (window.speechSynthesis) {
 /* ════════════════════════════════════════════════════════════════════════
    STR — Speech Recognition (fresh instance per call — iOS Safari safe)
 ════════════════════════════════════════════════════════════════════════ */
-var voiceActive   = false;
-var recognition   = null;
+const voiceActive   = false;
+const recognition   = null;
 
 function toggleVoice() {
   if (voiceActive) { stopVoice(); } else { startVoice(); }
 }
 
 function startVoice() {
-  var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
   if (!SR) {
     addMsg('Reconnaissance vocale non support\u00e9e sur ce navigateur.', 'ai', false);
     return;
@@ -928,7 +936,7 @@ function startVoice() {
   voiceActive = true;
   $('micBtn').classList.add('rec');
 
-  var interim = $('interimText');
+  const interim = $('interimText');
   interim.style.display = 'block';
   interim.textContent   = '\uD83C\uDF99\uFE0F Je vous \u00e9coute\u2026';
 
@@ -939,9 +947,9 @@ function startVoice() {
   recognition.maxAlternatives  = 1;
 
   recognition.onresult = function(e) {
-    var finalText   = '';
-    var interimText = '';
-    for (var i = e.resultIndex; i < e.results.length; i++) {
+    const finalText   = '';
+    const interimText = '';
+    for (const i = e.resultIndex; i < e.results.length; i++) {
       if (e.results[i].isFinal) { finalText   += e.results[i][0].transcript; }
       else                      { interimText += e.results[i][0].transcript; }
     }
@@ -967,14 +975,14 @@ function startVoice() {
 
 function stopVoice() {
   voiceActive = false;
-  var btn = $('micBtn');
+  const btn = $('micBtn');
   if (btn) btn.classList.remove('rec');
   if (recognition) {
     try { recognition.stop(); } catch (e) { /* ignore */ }
     recognition = null;
   }
   setTimeout(function() {
-    var i = $('interimText');
+    const i = $('interimText');
     if (i) i.style.display = 'none';
   }, 1400);
 }
@@ -1018,16 +1026,16 @@ function aiErrMsg(e) {
  * @returns {Promise<string>} — model response text
  */
 function mistralCall(payload, opts) {
-  var timeout = (opts && opts.timeout) || 30000;
-  var retries = (opts && opts.retries) !== undefined ? opts.retries : 2;
+  const timeout = (opts && opts.timeout) || 30000;
+  const retries = (opts && opts.retries) !== undefined ? opts.retries : 2;
 
   if (!navigator.onLine) {
     return Promise.reject({ type: 'offline' });
   }
 
   function attempt(n) {
-    var ctrl = new AbortController();
-    var tid  = setTimeout(function() { ctrl.abort(); }, timeout);
+    const ctrl = new AbortController();
+    const tid  = setTimeout(function() { ctrl.abort(); }, timeout);
 
     return fetch('https://api.mistral.ai/v1/chat/completions', {
       method: 'POST',
@@ -1049,7 +1057,7 @@ function mistralCall(payload, opts) {
       return r.json();
     })
     .then(function(data) {
-      var content = data && data.choices && data.choices[0] &&
+      const content = data && data.choices && data.choices[0] &&
                     data.choices[0].message && data.choices[0].message.content;
       if (!content) { return Promise.reject({ message: 'empty_response' }); }
       return content;
@@ -1076,8 +1084,8 @@ window.addEventListener('load', function() {
   } else {
     renderHist();
     if (hist.length === 0) {
-      var gn = patient.prenom ? 'Bonjour <strong>' + patient.prenom + '</strong>\u00a0\uD83D\uDC4B' : 'Bonjour\u00a0\uD83D\uDC4B Je suis <strong>OpenVita</strong>';
-      var gs = isChild() ? 'Glyc\u00e9mie, repas ou question \u2014 je suis l\u00e0.' : 'Dites-moi votre glyc\u00e9mie, photographiez votre repas, ou posez-moi une question.';
+      const gn = patient.prenom ? 'Bonjour <strong>' + patient.prenom + '</strong>\u00a0\uD83D\uDC4B' : 'Bonjour\u00a0\uD83D\uDC4B Je suis <strong>OpenVita</strong>';
+      const gs = isChild() ? 'Glyc\u00e9mie, repas ou question \u2014 je suis l\u00e0.' : 'Dites-moi votre glyc\u00e9mie, photographiez votre repas, ou posez-moi une question.';
       addMsg(gn + '<br>' + gs, 'ai', true);
     }
   }
@@ -1100,13 +1108,13 @@ function loadSettings() {
 }
 
 function refreshCalcSuggest() {
-  var age   = parseFloat($('ageIn').value)   || 0;
-  var poids = parseFloat($('poidsIn').value) || 0;
-  var card  = $('suggestCard');
+  const age   = parseFloat($('ageIn').value)   || 0;
+  const poids = parseFloat($('poidsIn').value) || 0;
+  const card  = $('suggestCard');
   if (!card) return;
   if (poids <= 0) { card.style.display = 'none'; return; }
-  var child = age > 0 && age < 18;
-  var tdd   = Math.round(poids * (child ? 0.4 : 0.5) * 10) / 10;
+  const child = age > 0 && age < 18;
+  const tdd   = Math.round(poids * (child ? 0.4 : 0.5) * 10) / 10;
   $('sug_tdd').textContent = tdd + ' U/j';
   $('sug_icr').textContent = Math.round(500  / tdd) + ' g/U';
   $('sug_isf').textContent = Math.round(1800 / tdd) + ' mg/dL/U';
@@ -1115,18 +1123,18 @@ function refreshCalcSuggest() {
 }
 
 function applyCalcSuggest() {
-  var age   = parseFloat($('ageIn').value)   || 0;
-  var poids = parseFloat($('poidsIn').value) || 0;
+  const age   = parseFloat($('ageIn').value)   || 0;
+  const poids = parseFloat($('poidsIn').value) || 0;
   if (!poids) return;
-  var child = age > 0 && age < 18;
-  var tdd   = poids * (child ? 0.4 : 0.5);
+  const child = age > 0 && age < 18;
+  const tdd   = poids * (child ? 0.4 : 0.5);
   $('icrIn').value     = Math.round(500  / tdd);
   $('isfIn').value     = Math.round(1800 / tdd);
   if (child) $('targetBgIn').value = 120;
 }
 
 function saveSettings() {
-  var newKey = $('apiIn').value.trim();
+  const newKey = $('apiIn').value.trim();
   dt1.icr    = parseFloat($('icrIn').value)     || 10;
   dt1.isf    = parseFloat($('isfIn').value)     || 40;
   dt1.target = parseFloat($('targetBgIn').value) || 100;
@@ -1143,7 +1151,7 @@ function saveSettings() {
   sl('s', 'ov_tgt', dt1.target);
   sl('s', 'ov_dia', dt1.dia);
 
-  var res = $('apiTestResult');
+  const res = $('apiTestResult');
   if (!res) return;
 
   if (!newKey) {
@@ -1157,14 +1165,14 @@ function saveSettings() {
   res.style.color   = 'var(--tx2)';
   res.textContent   = '\u23F3 Test de la cl\u00e9 en cours\u2026';
 
-  var testPayload = {
+  const testPayload = {
     model: 'mistral-small-2506',
     messages: [{ role: 'user', content: 'ping' }],
     max_tokens: 3
   };
 
   // Temporarily use the new key for the test
-  var prevKey = apiKey;
+  const prevKey = apiKey;
   apiKey = newKey;
 
   mistralCall(testPayload, { timeout: 9000, retries: 0 })
@@ -1178,7 +1186,7 @@ function saveSettings() {
         updatePatientBadge();
         renderHist();
         if (hist.length === 0) {
-          var g2 = patient.prenom ? 'Bonjour <strong>' + patient.prenom + '</strong>\u00a0\uD83D\uDC4B Profil enregistr\u00e9.' : 'Bonjour\u00a0\uD83D\uDC4B Profil enregistr\u00e9.';
+          const g2 = patient.prenom ? 'Bonjour <strong>' + patient.prenom + '</strong>\u00a0\uD83D\uDC4B Profil enregistr\u00e9.' : 'Bonjour\u00a0\uD83D\uDC4B Profil enregistr\u00e9.';
           addMsg(g2 + '<br>Glyc\u00e9mie, repas ou question \u2014 je suis l\u00e0.', 'ai', true);
         }
       }, 1200);
@@ -1208,7 +1216,7 @@ function saveSettings() {
    LOG BOLUS
 ════════════════════════════════════════════════════════════════════════ */
 window.logBolus = function(units, element) {
-  var u = parseFloat(units);
+  const u = parseFloat(units);
   if (isNaN(u) || u <= 0) return;
   hist.push({ role: 'user', content: '\uD83D\uDC89 Injection confirm\u00e9e\u00a0: ' + u.toFixed(1) + ' U', bolus: u, date: Date.now() });
   sl('s', 'ov_h', JSON.stringify(hist));
@@ -1225,9 +1233,9 @@ window.logBolus = function(units, element) {
    GLYCÉMIE
 ════════════════════════════════════════════════════════════════════════ */
 function promptBG() {
-  var val = window.prompt('Saisissez votre glyc\u00e9mie actuelle (mg/dL)\u00a0:');
+  const val = window.prompt('Saisissez votre glyc\u00e9mie actuelle (mg/dL)\u00a0:');
   if (val === null || val.trim() === '' || isNaN(val)) return;
-  var bg = parseInt(val, 10);
+  const bg = parseInt(val, 10);
   if (bg < 20 || bg > 600) {
     addMsg('\u26A0\uFE0F Valeur hors plage (20\u2013600 mg/dL).', 'ai', false);
     return;
@@ -1237,16 +1245,16 @@ function promptBG() {
   addMsg('\uD83E\uDE78 Ma glyc\u00e9mie est de <strong>' + bg + ' mg/dL</strong>', 'usr', false);
   updateBGChip(bg);
 
-  var range = bgTargetRange();
-  var capU  = maxBolus();
+  const range = bgTargetRange();
+  const capU  = maxBolus();
   if (bg < range[0]) {
     trigHypo();
   } else if (bg > dt1.target + 20) {
-    var iob        = getIOB();
-    var base       = (bg - dt1.target) / dt1.isf;
-    var correction = Math.max(0, base - iob);
-    var safeCorr   = capU ? Math.min(correction, capU) : correction;
-    var msg        = '\uD83D\uDCA1 <strong>Calcul de correction\u00a0:</strong><br>'
+    const iob        = getIOB();
+    const base       = (bg - dt1.target) / dt1.isf;
+    const correction = Math.max(0, base - iob);
+    const safeCorr   = capU ? Math.min(correction, capU) : correction;
+    const msg        = '\uD83D\uDCA1 <strong>Calcul de correction\u00a0:</strong><br>'
                    + '&mdash; Besoin brut\u00a0: ' + base.toFixed(1) + ' U<br>'
                    + '&mdash; IOB actif\u00a0: &minus;' + iob.toFixed(1) + ' U<br>';
     if (correction > 0) {
@@ -1266,14 +1274,14 @@ function promptBG() {
 }
 
 function trigHypo() {
-  var dose   = hypoCarbDose();
-  var child  = isChild();
-  var name   = patient.prenom || (child ? 'le patient' : 'vous');
-  var unitKg = (child && patient.poids > 0) ? ' (' + dose + 'g pour ' + patient.poids + ' kg)' : '';
-  var range  = bgTargetRange();
-  var title  = '\uD83D\uDEA8 <strong>ALERTE HYPOGLYC\u00c9MIE</strong>' + (patient.prenom ? ' \u2014 ' + patient.prenom : '');
+  const dose   = hypoCarbDose();
+  const child  = isChild();
+  const name   = patient.prenom || (child ? 'le patient' : 'vous');
+  const unitKg = (child && patient.poids > 0) ? ' (' + dose + 'g pour ' + patient.poids + ' kg)' : '';
+  const range  = bgTargetRange();
+  const title  = '\uD83D\uDEA8 <strong>ALERTE HYPOGLYC\u00c9MIE</strong>' + (patient.prenom ? ' \u2014 ' + patient.prenom : '');
   addMsg(title, 'usr', false);
-  var hmsg = '\u26A0\uFE0F <strong>Donnez ' + dose + 'g de sucre rapide' + unitKg + '</strong><br>'
+  const hmsg = '\u26A0\uFE0F <strong>Donnez ' + dose + 'g de sucre rapide' + unitKg + '</strong><br>'
            + (child ? '\uD83D\uDC76 Restez pr\u00e8s de ' + name + '.<br>' : '')
            + '\u23F3 Minuteur de 15 minutes lanc\u00e9.';
   addMsg(hmsg, 'ai', true);
@@ -1287,24 +1295,24 @@ function trigHypo() {
 ════════════════════════════════════════════════════════════════════════ */
 function addMsg(text, cls, doSpeak) {
   if (!text) return;
-  var chat = $('cwin');
-  var d    = document.createElement('div');
+  const chat = $('cwin');
+  const d    = document.createElement('div');
   d.className = 'msg ' + cls;
 
-  var foot = document.createElement('div');
+  const foot = document.createElement('div');
   foot.className = 'msg-foot';
 
-  var tsEl = document.createElement('span');
+  const tsEl = document.createElement('span');
   tsEl.className   = 'msg-ts';
   tsEl.textContent = ts();
   foot.appendChild(tsEl);
 
   if (cls === 'ai') {
-    var spk     = document.createElement('button');
+    const spk     = document.createElement('button');
     spk.className = 'speak-btn';
     spk.title   = 'Lire \u00e0 voix haute';
     spk.textContent = '\uD83D\uDD09';
-    var capturedText = text;
+    const capturedText = text;
     spk.onclick = function() { speakOne(spk, capturedText); };
     foot.appendChild(spk);
   }
@@ -1317,8 +1325,8 @@ function addMsg(text, cls, doSpeak) {
 }
 
 function addMsgHTML(html, cls) {
-  var chat = $('cwin');
-  var d    = document.createElement('div');
+  const chat = $('cwin');
+  const d    = document.createElement('div');
   d.className = 'msg ' + cls;
   d.innerHTML = (html || '') + '<div class="msg-foot"><span class="msg-ts">' + ts() + '</span></div>';
   chat.appendChild(d);
@@ -1326,12 +1334,12 @@ function addMsgHTML(html, cls) {
 }
 
 function renderHist() {
-  var cwin = $('cwin');
+  const cwin = $('cwin');
   if (!cwin) return;
   cwin.innerHTML = '';
   hist.forEach(function(m) {
     if (m.role === 'system') return;
-    var text = typeof m.content === 'string' ? m.content : '[Image analys\u00e9e]';
+    const text = typeof m.content === 'string' ? m.content : '[Image analys\u00e9e]';
     addMsg(text, m.role === 'user' ? 'usr' : 'ai', false);
   });
   updateIOBUI();
@@ -1340,12 +1348,12 @@ function renderHist() {
 /* ════════════════════════════════════════════════════════════════════════
    SEND / callAI
 ════════════════════════════════════════════════════════════════════════ */
-var _aiInFlight = false;
+const _aiInFlight = false;
 
 function send() {
-  var inp = $('uIn');
+  const inp = $('uIn');
   if (!inp) return;
-  var text = inp.value.trim();
+  const text = inp.value.trim();
   if (!text) return;
 
   // Visual guard if a request is already in flight
@@ -1367,53 +1375,53 @@ function callAI() {
   if (_aiInFlight) return;
   _aiInFlight = true;
 
-  var chat = $('cwin');
+  const chat = $('cwin');
   if (!chat) { _aiInFlight = false; return; }
 
   // Remove any stale loading bubble
-  var stale = document.getElementById('__ld__');
+  const stale = document.getElementById('__ld__');
   if (stale) stale.parentNode.removeChild(stale);
 
-  var ld = document.createElement('div');
+  const ld = document.createElement('div');
   ld.className = 'msg ai';
   ld.id        = '__ld__';
   ld.innerHTML = '<span class="dots"><span></span><span></span><span></span></span>';
   chat.appendChild(ld);
   chat.scrollTop = chat.scrollHeight;
 
-  var _tdd   = estimateTDD();
-  var _cap   = maxBolus();
-  var _pat   = '';
+  const _tdd   = estimateTDD();
+  const _cap   = maxBolus();
+  const _pat   = '';
   if (patient.prenom) _pat += ' Prenom: ' + patient.prenom + '.';
   if (patient.age)    _pat += ' Age: ' + patient.age + ' ans.';
   if (patient.poids)  _pat += ' Poids: ' + patient.poids + ' kg.';
-  var _kid = isChild()
+  const _kid = isChild()
     ? ' PATIENT ENFANT PEDIATRIQUE. Adapter langage et doses.'
       + ' Dose hypo: ' + hypoCarbDose() + 'g. Cibles: 80-150 mg/dL.'
       + (_tdd ? ' TDD: ' + _tdd + ' U/j.' : '')
       + (_cap ? ' Bolus max: ' + _cap + ' U.' : '')
     : '';
-  var sysContent = 'Tu es un assistant medical specialise Diabete Type 1.'
+  const sysContent = 'Tu es un assistant medical specialise Diabete Type 1.'
                  + ' Reponds en francais, facon concise et bienveillante.'
                  + _pat + _kid
                  + ' Parametres: ICR=' + dt1.icr + ', ISF=' + dt1.isf
                  + ', Cible=' + dt1.target + ', DIA=' + dt1.dia + 'h.'
                  + ' IOB: ' + getIOB().toFixed(1) + ' U.';
 
-  var msgs = sanitizeMsgs(
+  const msgs = sanitizeMsgs(
     [{ role: 'system', content: sysContent }].concat(hist.slice(-12))
   );
 
   mistralCall({ model: 'mistral-small-2506', messages: msgs, temperature: 0.2, max_tokens: 500 })
     .then(function(rep) {
-      var stale2 = document.getElementById('__ld__');
+      const stale2 = document.getElementById('__ld__');
       if (stale2) stale2.parentNode.removeChild(stale2);
       addMsg(rep, 'ai', true);
       hist.push({ role: 'assistant', content: rep, date: Date.now() });
       sl('s', 'ov_h', JSON.stringify(hist));
     })
     .catch(function(e) {
-      var stale2 = document.getElementById('__ld__');
+      const stale2 = document.getElementById('__ld__');
       if (stale2) stale2.parentNode.removeChild(stale2);
       addMsg(aiErrMsg(e), 'ai', false);
       if (e && e.status === 401) {
@@ -1429,19 +1437,19 @@ function callAI() {
 function runAIBilan() {
   if (!apiKey) { openM('mApi'); return; }
   openM('mBilan');
-  var div = $('bilanContent');
+  const div = $('bilanContent');
   div.innerHTML = '<span class="dots"><span></span><span></span><span></span></span> Analyse en cours\u2026';
 
-  var recent = hist.filter(function(h) { return h.bg || h.carbs || h.bolus; }).slice(-20);
-  var log    = recent.map(function(h) {
-    var t = new Date(h.date).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+  const recent = hist.filter(function(h) { return h.bg || h.carbs || h.bolus; }).slice(-20);
+  const log    = recent.map(function(h) {
+    const t = new Date(h.date).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
     if (h.bg)    return '[' + t + '] Glyc\u00e9mie: ' + h.bg + ' mg/dL';
     if (h.carbs) return '[' + t + '] Repas: ' + h.carbs + 'g glucides';
     if (h.bolus) return '[' + t + '] Bolus: ' + h.bolus + ' U';
     return '';
   }).join('\n');
 
-  var prompt = 'Tu es sp\u00e9cialiste DT1. Param\u00e8tres\u00a0: ICR=' + dt1.icr
+  const prompt = 'Tu es sp\u00e9cialiste DT1. Param\u00e8tres\u00a0: ICR=' + dt1.icr
              + ', ISF=' + dt1.isf + ', Cible=' + dt1.target + '.\n'
              + 'Historique\u00a0:\n' + log + '\n'
              + 'Analyse les sch\u00e9mas, identifie les tendances et sugg\u00e8re des ajustements en 3\u20134 points cl\u00e9s.';
@@ -1464,12 +1472,12 @@ function runAIBilan() {
 /* ════════════════════════════════════════════════════════════════════════
    STATS CHART
 ════════════════════════════════════════════════════════════════════════ */
-var trackerChart = null;
+const trackerChart = null;
 
 function openStats() {
   openM('mStats');
-  var ctx    = $('trackerChart').getContext('2d');
-  var labels = [], carbsArr = [], bgArr = [];
+  const ctx    = $('trackerChart').getContext('2d');
+  const labels = [], carbsArr = [], bgArr = [];
 
   hist.forEach(function(h) {
     if (h.carbs !== undefined || h.bg !== undefined) {
@@ -1540,13 +1548,13 @@ function openStats() {
    EXPORT / IMPORT
 ════════════════════════════════════════════════════════════════════════ */
 function exportData() {
-  var payload = JSON.stringify({
+  const payload = JSON.stringify({
     hist: sl('g', 'ov_h'),
     icr: dt1.icr, isf: dt1.isf,
     tgt: dt1.target, dia: dt1.dia
   });
-  var blob = new Blob([payload], { type: 'application/json' });
-  var a    = document.createElement('a');
+  const blob = new Blob([payload], { type: 'application/json' });
+  const a    = document.createElement('a');
   a.href   = URL.createObjectURL(blob);
   a.download = 'openvita_dt1.json';
   document.body.appendChild(a);
@@ -1556,12 +1564,12 @@ function exportData() {
 }
 
 function importData(event) {
-  var file = event.target.files[0];
+  const file = event.target.files[0];
   if (!file) return;
-  var reader = new FileReader();
+  const reader = new FileReader();
   reader.onload = function(e) {
     try {
-      var data = JSON.parse(e.target.result);
+      const data = JSON.parse(e.target.result);
       if (data.hist) sl('s', 'ov_h', data.hist);
       alert('\u2705 Importation r\u00e9ussie\u00a0!');
       location.reload();
@@ -1575,10 +1583,10 @@ function importData(event) {
 /* ════════════════════════════════════════════════════════════════════════
    CAMERA / PLATE ANALYSIS
 ════════════════════════════════════════════════════════════════════════ */
-var plateStream   = null;
-var plateImageB64 = null;
+const plateStream   = null;
+const plateImageB64 = null;
 
-var CARB_PROMPT = 'Tu es expert nutrition DT1. Analyse l\'assiette photo.'
+const CARB_PROMPT = 'Tu es expert nutrition DT1. Analyse l\'assiette photo.'
                 + ' REPONDS EN JSON STRICT UNIQUEMENT, sans texte avant ou apr\u00e8s\u00a0:'
                 + ' {"aliments":[{"nom":"nom","portion_g":150,"glucides_g":30.5}],'
                 + '"glucides_total":62.5,"message":"Astuce courte"}';
@@ -1614,8 +1622,8 @@ function closePlateModal() {
 }
 
 function snapPhoto() {
-  var v = $('plateVideo');
-  var c = $('plateCanvas');
+  const v = $('plateVideo');
+  const c = $('plateCanvas');
   c.width  = v.videoWidth;
   c.height = v.videoHeight;
   c.getContext('2d').drawImage(v, 0, 0);
@@ -1638,7 +1646,7 @@ function retakePhoto() {
   $('previewPhase').style.display  = 'none';
   $('analyzingPhase').style.display = 'none';
   $('snapPhase').style.display     = 'block';
-  var v = $('plateVideo');
+  const v = $('plateVideo');
   v.style.display = 'block';
   navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
     .then(function(stream) {
@@ -1655,7 +1663,7 @@ function analyzePlate() {
   $('previewPhase').style.display   = 'none';
   $('analyzingPhase').style.display = 'block';
 
-  var payload = {
+  const payload = {
     model: 'pixtral-12b-2409',
     messages: [{
       role: 'user',
@@ -1670,10 +1678,10 @@ function analyzePlate() {
 
   mistralCall(payload, { retries: 1 })
     .then(function(raw) {
-      var clean = raw.trim().replace(/```json/gi, '').replace(/```/g, '').trim();
-      var match = clean.match(/\{[\s\S]+\}/);
+      const clean = raw.trim().replace(/```json/gi, '').replace(/```/g, '').trim();
+      const match = clean.match(/\{[\s\S]+\}/);
       if (!match) throw { message: 'no_json' };
-      var result = JSON.parse(match[0]);
+      const result = JSON.parse(match[0]);
       closePlateModal();
       renderCarbResult(result, plateImageB64);
     })
@@ -1691,11 +1699,11 @@ function analyzePlate() {
 function renderCarbResult(r, imgSrc) {
   addMsgHTML('<img src="' + imgSrc + '" class="prev-img" alt="Repas analys\u00e9">', 'usr');
 
-  var total      = parseFloat(r.glucides_total) || 0;
-  var bolusRepas = total / dt1.icr;
-  var iob        = getIOB();
-  var finalBolus = bolusRepas;
-  var iobHTML    = '';
+  const total      = parseFloat(r.glucides_total) || 0;
+  const bolusRepas = total / dt1.icr;
+  const iob        = getIOB();
+  const finalBolus = bolusRepas;
+  const iobHTML    = '';
 
   if (iob > 0) {
     finalBolus = Math.max(0, bolusRepas - iob);
@@ -1704,16 +1712,16 @@ function renderCarbResult(r, imgSrc) {
                + '</div>';
   }
 
-  var rows = (r.aliments || []).map(function(a) {
+  const rows = (r.aliments || []).map(function(a) {
     return '<div class="carb-row"><span>' + a.nom + '</span><span>' + a.glucides_g + 'g</span></div>';
   }).join('');
 
-  var capM      = maxBolus();
-  var safeFinal = capM ? Math.min(finalBolus, capM) : finalBolus;
-  var capWarnH  = (capM && finalBolus > capM)
+  const capM      = maxBolus();
+  const safeFinal = capM ? Math.min(finalBolus, capM) : finalBolus;
+  const capWarnH  = (capM && finalBolus > capM)
     ? '<div class="bolus-warn">\u26A0\uFE0F Bolus r\u00e9duit au cap (' + capM + ' U = 20% TDD). Consultez votre m\u00e9decin.</div>'
     : '';
-  var html = '<div class="carb-result">'
+  const html = '<div class="carb-result">'
            + '<div class="carb-total">' + total + 'g<span>glucides estim\u00e9s</span></div>'
            + '<div class="carb-rows">' + rows + '</div>'
            + '<div class="plate-tip">\uD83D\uDC89 Bolus sugg\u00e9r\u00e9\u00a0: ' + safeFinal.toFixed(1) + ' U</div>'
@@ -1739,7 +1747,7 @@ document.getElementById('ageIn').addEventListener('input', refreshCalcSuggest);
 document.getElementById('poidsIn').addEventListener('input', refreshCalcSuggest);
 
 document.getElementById('fInput').addEventListener('change', function(e) {
-  var file = e.target.files[0];
+  const file = e.target.files[0];
   if (!file) return;
 
   if (!apiKey) {
@@ -1748,7 +1756,7 @@ document.getElementById('fInput').addEventListener('change', function(e) {
     return;
   }
 
-  var reader = new FileReader();
+  const reader = new FileReader();
   reader.onload = function(ev) {
     plateImageB64 = ev.target.result;
     $('plateModal').classList.add('on');
@@ -1761,5 +1769,7 @@ document.getElementById('fInput').addEventListener('change', function(e) {
   e.target.value = '';
 });
 </script>
+
+</main>
 </body>
 </html>
