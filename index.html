@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>OpenVita DT1 Pro</title>
-  <meta name="theme-color" content="#020509">
+  <meta name="theme-color" content="#020509" media="(prefers-color-scheme: dark)">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="OpenVita">
@@ -13,7 +13,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Exo+2:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;0,800;1,300&family=JetBrains+Mono:ital,wght@0,300;0,400;0,500;0,600;1,300&display=swap" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
 
   <style>
     /* ════════════════════════════════════════════════════════
@@ -525,6 +525,30 @@
 .skeleton{background:linear-gradient(90deg,rgba(0,255,157,.07) 25%,rgba(0,255,157,.15) 50%,rgba(0,255,157,.07) 75%);background-size:200% 100%;animation:skel-wave 1.4s infinite;border-radius:6px;min-height:1em}
 @keyframes skel-wave{0%{background-position:200% 0}100%{background-position:-200% 0}}
 
+
+/* ── GPU acceleration hints ── */
+@media (prefers-reduced-motion: no-preference) {
+  [class*="btn"],[class*="button"],[class*="card"],[class*="modal"],[class*="tab"],[class*="panel"] {
+    will-change: transform, opacity;
+    transform: translateZ(0);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  *,*::before,*::after { animation-duration:.01ms !important; transition-duration:.01ms !important; }
+}
+
+
+/* ── Dark mode system preference — Studio Niko Design ── */
+@media (prefers-color-scheme: light) {
+  :root {
+    --bg: #f0f4f8;
+    --bg2: #e2e8f0;
+    --text: #1a202c;
+    --accent: #0070f3;
+  }
+  body { background: var(--bg); color: var(--text); }
+}
+
 </style>
 <script>
 
@@ -703,7 +727,7 @@ const safeStorage = (() => {
   <div class="plate-vp">
     <video id="plateVideo" autoplay playsinline muted></video>
     <canvas id="plateCanvas"></canvas>
-    <img id="platePreview" alt="Assiette">
+    <img loading="lazy" decoding="async" id="platePreview" alt="Assiette">
   </div>
   <div class="plate-ctrl">
     <div id="snapPhase">
@@ -1770,7 +1794,7 @@ function analyzePlate() {
 }
 
 function renderCarbResult(r, imgSrc) {
-  addMsgHTML('<img src="' + imgSrc + '" class="prev-img" alt="Repas analys\u00e9">', 'usr');
+  addMsgHTML('<img loading="lazy" decoding="async" src="' + imgSrc + '" class="prev-img" alt="Repas analys\u00e9">', 'usr');
 
   const total      = parseFloat(r.glucides_total) || 0;
   const bolusRepas = total / dt1.icr;
@@ -1844,5 +1868,21 @@ document.getElementById('fInput').addEventListener('change', function(e) {
 </script>
 
 </main>
+
+<!-- ── Disclaimer médical — Studio Niko Design ── -->
+<div id="nikoDisclaimer" style="display:none;position:fixed;bottom:0;left:0;right:0;z-index:10000;background:rgba(5,10,13,.97);border-top:1px solid rgba(0,212,255,.3);padding:12px 20px;font-family:'Share Tech Mono',monospace;font-size:11px;color:rgba(255,255,255,.7);text-align:center;backdrop-filter:blur(8px)">
+  ⚕️ <strong>Avis médical :</strong> Cette application est un outil d'aide — elle ne remplace pas l'avis d'un professionnel de santé qualifié. En cas d'urgence, appelez le <strong>15 (SAMU)</strong>.
+  &nbsp;|&nbsp; <a href="#" onclick="document.getElementById('nikoDisclaimer').style.display='none';localStorage.setItem('disclaimer_ok','1');return false" style="color:#00ff9d;text-decoration:none">J'ai compris ✕</a>
+</div>
+<script>if(!localStorage.getItem('disclaimer_ok'))document.getElementById('nikoDisclaimer').style.display='block';</script>
+
+
+<!-- ── Notice RGPD — Studio Niko Design ── -->
+<div id="nikoRGPD" style="display:none;position:fixed;bottom:0;left:0;right:0;z-index:9999;background:rgba(5,10,13,.97);border-top:1px solid rgba(0,255,157,.25);padding:14px 20px 14px;font-family:'Share Tech Mono',monospace;font-size:11px;color:rgba(255,255,255,.75);backdrop-filter:blur(8px)">
+  <strong style="color:#00ff9d">🔒 Confidentialité</strong> — Vos données restent sur votre appareil (stockage local chiffré AES-256-GCM). Aucune donnée personnelle n'est transmise à des tiers. Conforme RGPD.
+  &nbsp;<a href="#" onclick="document.getElementById('nikoRGPD').style.display='none';localStorage.setItem('rgpd_ok','1');return false" style="color:#00d4ff;text-decoration:none;margin-left:12px">Accepter ✕</a>
+</div>
+<script>if(!localStorage.getItem('rgpd_ok'))document.getElementById('nikoRGPD').style.display='block';</script>
+
 </body>
 </html>
