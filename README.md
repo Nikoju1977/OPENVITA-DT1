@@ -12,7 +12,7 @@ Un prototype de recherche sur les interfaces de journal glycémique, les calculs
 
 [Démo existante (disponibilité non vérifiée)](https://nikoju1977.github.io/OPENVITA-DT1/) · [English overview](#english-overview) · [Quickstart](#quickstart--démarrage-rapide)
 
-> [Insérer ici un GIF de démonstration avec données fictives / Insert synthetic-data demo GIF here]
+> Démonstration et qualification : données fictives uniquement. Aucun GIF ni résultat de test n'est revendiqué.
 
 > **Prototype non validé cliniquement.** Ne pas utiliser pour une décision médicale, un diagnostic, une prescription ou une urgence. En France, danger immédiat : 15 ou 112. Inspection statique de sources uniquement ; aucun nouveau test, audit de sécurité, appel réel fournisseur, essai sur appareil ou validation clinique n'a été réalisé pour ce README.
 
@@ -70,6 +70,23 @@ Les références à la qualité des dispositifs médicaux (ISO 13485), au cycle 
 ## Quickstart / Démarrage rapide
 
 Pour examiner l'interface sans usage clinique, servir le dépôt avec `python3 -m http.server 8000` puis ouvrir http://localhost:8000/. Utiliser uniquement des données fictives ; ne pas configurer de clé réelle ni envoyer de photo privée. Ne pas suivre les suggestions de dose affichées par l'interface.
+
+## Sécurité clinique — conditions préalables à toute qualification
+
+> **Priorité critique : neutraliser les suggestions de dose et de paramètres thérapeutiques.** Le projet contient encore des calculs et propositions non validés, y compris pour des profils pédiatriques. Les utiliser pour une injection ou une modification du traitement peut être dangereux. Cette révision documentaire n'en désactive pas le code.
+
+| Contrôle proposé (non exécuté) | Critère de sécurité attendu |
+| --- | --- |
+| Journal descriptif | Restituer fidèlement des observations fictives, avec unité et provenance explicites |
+| Données incomplètes | Signaler l'indisponibilité ; ne produire aucune suggestion thérapeutique |
+| Unités incompatibles | Bloquer les interprétations ambiguës ; vérifier les libellés et conversions sans calcul de dose |
+| Historique d'injections | Distinguer une observation déclarée d'une administration confirmée ; aucune action thérapeutique automatique |
+| Analyse IA / photo | Empêcher l'utilisation des réponses génératives comme base d'un traitement ; aucune photo privée ni clé réelle lors des essais |
+| Confidentialité | Séparer identifiants, données de santé et secrets ; qualifier le stockage et les transferts avant toute utilisation réelle |
+
+Le journal seul ne constitue ni une surveillance glycémique continue ni une alarme médicale. Les mentions de Nightscout et oref1 dans les métadonnées HTML ne prouvent pas leur disponibilité. Les critères ci-dessus sont des objectifs de réduction de risque, pas des résultats de tests ou une autorisation d'usage clinique.
+
+**English:** Disable all unvalidated treatment suggestions before considering real-world use. Keep synthetic descriptive records separate from therapeutic decisions, verify units and data provenance, and prevent AI outputs from informing insulin administration. No clinical, security or runtime validation was performed here.
 
 ## Roadmap & contribution
 
