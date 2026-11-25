@@ -43,3 +43,11 @@ Les anciennes données en clair et clés API ne sont ni chargées automatiquemen
 OpenVita is a descriptive local journal with an encrypted persistent vault, manual observations, unit-specific statistics, and encrypted backup/restore code. It does not calculate insulin doses, interpret clinical data, or connect to medical devices. Fourteen data-validation and statistics assertions passed; runtime, security, clinical and deployment verification remain outstanding.
 
 [MIT license](LICENSE) — unchanged. [Studio Niko Design](https://github.com/Nikoju1977).
+
+
+## Qualification navigateur — 25 novembre 2026
+
+Le test [tests/browser-vault.cjs](tests/browser-vault.cjs) exerce l'interface réelle dans Chromium headless sur localhost, sans modèle distant ni données personnelles : création de coffre, Web Crypto, ajout/modification/suppression, verrouillage, mauvais mot de passe, rechargement, capture du blob exporté, rejet d'un ciphertext modifié, restauration dans un nouveau coffre et viewport mobile simulé. Exécution : `node tests/browser-vault.cjs` (Node avec WebSocket, Chrome/Chromium et Python 3). [Workflow dédié](.github/workflows/browser-vault.yml) · [Premier run](https://github.com/Nikoju1977/OPENVITA-DT1/actions/runs/45704539496), en attente au contrôle initial. Aucun résultat de test navigateur n'est revendiqué avant la conclusion du run.
+
+Le code applicatif reste MIT. Le script de test indépendant reprend une partie du banc Chromium de [NikoAssist](https://github.com/Nikoju1977/Nikoassist/blob/main/web/browser-smoke.cjs), Studio Niko Design ; ce seul script est sous GPL-3.0-or-later, avec [texte de licence](tests/LICENSE-GPL-3.0). Le navigateur et le test communiquent via CDP ; le script ne constitue pas une dépendance embarquée dans l'application.
+
