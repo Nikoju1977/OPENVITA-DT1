@@ -1,0 +1,28 @@
+name: OpenVita - encrypted vault browser tests
+on:
+  push:
+    paths:
+      - 'index.html'
+      - 'tests/**'
+      - '.github/workflows/browser-vault.yml'
+  pull_request:
+    paths:
+      - 'index.html'
+      - 'tests/**'
+      - '.github/workflows/browser-vault.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  chromium-vault:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - name: Check Node and Chrome
+        run: |
+          node --version
+          google-chrome --version
+          node -e 'if(typeof WebSocket!=="function")process.exit(1)'
+      - name: Browser journal and Web Crypto (synthetic data)
+        run: node tests/browser-vault.cjs
